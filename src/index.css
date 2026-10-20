@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ */
+/* Material 3 (M3) color tokens - Light theme (default)               */
+/* ------------------------------------------------------------------ */
+:root {
+  --md-primary: 103 80 164; /* #6750A4 */
+  --md-on-primary: 255 255 255;
+  --md-primary-container: 234 221 255; /* #EADDFF */
+  --md-on-primary-container: 33 0 93; /* #21005D */
+  --md-secondary: 98 91 113; /* #625B71 */
+  --md-on-secondary: 255 255 255;
+  --md-secondary-container: 232 222 248; /* #E8DEF8 */
+  --md-on-secondary-container: 29 25 43; /* #1D192B */
+  --md-tertiary: 125 82 96; /* #7D5260 */
+  --md-surface: 254 247 255; /* #FEF7FF */
+  --md-surface-variant: 231 224 236; /* #E7E0EC */
+  --md-on-surface: 29 27 32; /* #1D1B20 */
+  --md-on-surface-variant: 73 69 79; /* #49454F */
+  --md-outline: 121 116 126; /* #79747E */
+  --md-outline-variant: 202 196 208; /* #CAC4D0 */
+  --md-error: 179 38 30; /* #B3261E */
+  --md-error-container: 249 222 220; /* #F9DEDC */
+  --md-on-error: 255 255 255;
+  --md-on-error-container: 65 14 11; /* #410E0B */
+
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------------ */
+/* Material 3 (M3) color tokens - Dark theme                          */
+/* ------------------------------------------------------------------ */
+.dark {
+  --md-primary: 208 188 255; /* #D0BCFF */
+  --md-on-primary: 56 30 114; /* #381E72 */
+  --md-primary-container: 79 55 139; /* #4F378B */
+  --md-on-primary-container: 234 221 255;
+  --md-secondary: 204 194 220; /* #CCC2DC */
+  --md-on-secondary: 50 47 61; /* #332F3D */
+  --md-secondary-container: 74 68 88; /* #4A4458 */
+  --md-on-secondary-container: 232 222 248;
+  --md-tertiary: 239 184 200; /* #EFB8C8 */
+  --md-surface: 20 18 24; /* #141218 */
+  --md-surface-variant: 73 69 79; /* #49454F */
+  --md-on-surface: 230 224 233; /* #E6E0E9 */
+  --md-on-surface-variant: 202 196 208; /* #CAC4D0 */
+  --md-outline: 147 143 153; /* #938F99 */
+  --md-outline-variant: 73 69 79; /* #49454F */
+  --md-error: 242 184 181; /* #F2B8B5 */
+  --md-error-container: 140 29 24; /* #8C1D18 */
+  --md-on-error: 96 20 16;
+  --md-on-error-container: 249 222 220;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-surface text-on-surface antialiased;
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Roboto', system-ui, 'Segoe UI', sans-serif;
+  }
+}
+
+@layer components {
+  /* M3 filled text field */
+  .m3-field {
+    @apply w-full rounded-m3-xs border border-outline bg-transparent px-4 py-3
+      text-on-surface outline-none transition-colors
+      focus:border-primary focus:ring-1 focus:ring-primary
+      placeholder:text-on-surface-variant disabled:opacity-50;
+  }
+
+  /* M3 surface card with subtle elevation */
+  .m3-card {
+    @apply rounded-m3-lg border border-outline-variant bg-surface shadow-m3-1;
+  }
+
+  /* Material ripple used by the completion checkbox / check-in control. */
+  .m3-ripple {
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .m3-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    transform: scale(0.4);
+    transition:
+      opacity 250ms ease-out,
+      transform 250ms ease-out;
+    pointer-events: none;
+  }
+
+  .m3-ripple:active::after {
+    opacity: 0.25;
+    transform: scale(1.8);
+    transition: 0ms;
+  }
+}
+
+/* Toast-like pop animation used for feedback messages. */
+@keyframes m3-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-pop {
+  animation: m3-pop 200ms ease-out;
+}
+
+/* Slim, themed scrollbar for scrollable panels (notifications, columns). */
+.m3-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--md-outline-variant)) transparent;
+}
+
+.m3-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.m3-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--md-outline-variant));
+  border-radius: 9999px;
+}
