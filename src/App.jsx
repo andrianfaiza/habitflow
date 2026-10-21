@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthProvider'
 import { ProfileProvider } from './context/ProfileProvider'
 import { DataProvider } from './context/DataProvider'
@@ -12,11 +12,25 @@ import { Home } from './pages/Dashboard/Home'
 import { UserProfile } from './pages/Profile/UserProfile'
 import { Settings } from './pages/Profile/Settings'
 
+// Shell for authenticated pages: header + routed page content.
+function AppLayout() {
+  return (
+    <div className="min-h-screen bg-surface">
+      <Header />
+      <main className="py-6">
+        <Container>
+          <Outlet />
+        </Container>
+      </main>
+    </div>
+  )
+}
+
 // Renders the correct screen based on the authentication state and the
-// currently selected view (no router needed for the MVP).
+// current URL route.
 function AppContent() {
   const { user, loading } = useAuth()
-  const [view, setView] = useState('dashboard')
+  const location = useLocation()
 
   if (loading) {
     return (
@@ -26,20 +40,24 @@ function AppContent() {
     )
   }
 
-  // Unauthenticated users only see the auth screen.
-  if (!user) return <AuthScreen />
+  // Unauthenticated users only see the auth screen. Any deep link is reset to
+  // the root so the address bar stays consistent after signing out.
+  if (!user) {
+    if (location.pathname !== '/') {
+      return <Navigate to="/" replace />
+    }
+    return <AuthScreen />
+  }
 
   return (
-    <div className="min-h-screen bg-surface">
-      <Header currentView={view} onNavigate={setView} />
-      <main className="py-6">
-        <Container>
-          {view === 'dashboard' ? <Home /> : null}
-          {view === 'profile' ? <UserProfile /> : null}
-          {view === 'settings' ? <Settings /> : null}
-        </Container>
-      </main>
-    </div>
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route index element={<Home />} />
+        <Route path="profile" element={<UserProfile />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
   )
 }
 

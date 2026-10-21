@@ -1,4 +1,5 @@
 import { LogOut, Moon, Sun } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useProfile } from '../../hooks/useProfile'
 import { useTheme } from '../../hooks/useTheme'
@@ -10,7 +11,7 @@ import { Container } from './Container'
 
 // Application header: brand, navigation, notifications and account actions
 // (see design.md section 1).
-export function Header({ currentView, onNavigate }) {
+export function Header() {
   const { isDark, toggleTheme } = useTheme()
   const { signOut } = useAuth()
   const { profile } = useProfile()
@@ -22,7 +23,11 @@ export function Header({ currentView, onNavigate }) {
       <Container className="flex flex-col gap-2 py-3">
         {/* Top row: brand + actions */}
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+          <Link
+            to="/"
+            className="flex items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label="HabitFlow — Dasbor"
+          >
             <span className="flex h-9 w-9 items-center justify-center rounded-m3-md bg-primary text-on-primary shadow-m3-1">
               {/* Simple flame mark representing the habit streak */}
               <span className="text-lg leading-none">🔥</span>
@@ -33,7 +38,7 @@ export function Header({ currentView, onNavigate }) {
                 To Do List &amp; Habit Tracker
               </p>
             </div>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-1 sm:gap-2">
             <span className="hidden rounded-full bg-surface-variant px-3 py-1.5 text-xs font-medium text-on-surface-variant md:inline-flex">
@@ -46,15 +51,14 @@ export function Header({ currentView, onNavigate }) {
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </IconButton>
             <NotificationBell />
-            <button
-              type="button"
-              onClick={() => onNavigate('profile')}
+            <Link
+              to="/profile"
               aria-label="Buka profil"
               title="Buka profil"
               className="rounded-full transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <Avatar size="sm" value={profile?.avatar_url} name={displayName || 'P'} />
-            </button>
+            </Link>
             <IconButton label="Keluar" onClick={signOut}>
               <LogOut size={18} />
             </IconButton>
@@ -63,7 +67,7 @@ export function Header({ currentView, onNavigate }) {
 
         {/* Navigation tabs */}
         <div className="-mx-1 overflow-x-auto lg:mx-0">
-          <Navbar currentView={currentView} onNavigate={onNavigate} />
+          <Navbar />
         </div>
       </Container>
     </header>

@@ -24,6 +24,7 @@ Aplikasi *To-Do List & Habit Tracker* sederhana berbasis **React (Vite) + Tailwi
 ## Tech Stack
 
 - React 19 + Vite
+- React Router (`react-router-dom`)
 - Tailwind CSS v3
 - `@supabase/supabase-js`
 - `lucide-react`
@@ -103,6 +104,10 @@ src/
 
 ## Catatan Arsitektur
 
+- **Routing:** halaman Dasbor, Profil, dan Pengaturan masing-masing memiliki URL
+  sendiri (`/`, `/profile`, `/settings`) menggunakan `react-router-dom`
+  (`BrowserRouter` + `Routes`). Navigasi memakai `NavLink` sehingga tab aktif
+  ditentukan otomatis dari URL.
 - **Optimistic updates:** mencentang tugas/habit langsung memperbarui UI; bila
   gagal, state di-*rollback*.
 - **Tanggal log habit** selalu memakai string lokal `YYYY-MM-DD` (lihat
