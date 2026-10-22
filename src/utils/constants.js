@@ -43,6 +43,27 @@ export const CONTENT_FILTERS = [
 // Preset avatars (emoji) that users can pick from on the profile page.
 export const AVATAR_PRESETS = ['🦊', '🐼', '🐨', '🦁', '🐧', '🐸', '🦄', '🐙', '🌻', '🚀', '🧠', '⭐']
 
+// Custom color tags for tasks and habits. Only the id is persisted in the
+// database; the hex value is used for inline accents and calendar dots.
+export const COLOR_TAGS = [
+  { id: 'orange', label: 'Orange', hex: '#F97316' },
+  { id: 'lavender', label: 'Lavender', hex: '#6750A4' },
+  { id: 'blue', label: 'Blue', hex: '#3B82F6' },
+  { id: 'mint', label: 'Mint', hex: '#10B981' },
+  { id: 'amber', label: 'Amber', hex: '#F59E0B' },
+  { id: 'pink', label: 'Pink', hex: '#EC4899' },
+]
+
+export const DEFAULT_TASK_COLOR = 'lavender'
+export const DEFAULT_HABIT_COLOR = 'mint'
+
+export const COLOR_TAG_MAP = Object.fromEntries(COLOR_TAGS.map((color) => [color.id, color]))
+
+// Resolves a stored color id to its palette entry, falling back to a default.
+export function getColorTag(id, fallback = DEFAULT_TASK_COLOR) {
+  return COLOR_TAG_MAP[id] ?? COLOR_TAG_MAP[fallback]
+}
+
 // Default user preferences stored in profiles.preferences.
 export const DEFAULT_PREFERENCES = {
   notifications: {

@@ -1,3 +1,4 @@
+import { useLayoutEffect } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthProvider'
 import { ProfileProvider } from './context/ProfileProvider'
@@ -31,6 +32,12 @@ function AppLayout() {
 function AppContent() {
   const { user, loading } = useAuth()
   const location = useLocation()
+
+  // Reset the document scroll whenever the route changes. Without this a page
+  // opened from a scrolled dashboard inherits the old offset and can look blank.
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
 
   if (loading) {
     return (

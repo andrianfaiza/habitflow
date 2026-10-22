@@ -1,5 +1,6 @@
 import { Check, Pencil, Trash2 } from 'lucide-react'
 import { StreakCounter } from './StreakCounter'
+import { getColorTag } from '../../utils/constants'
 
 // Single habit row with a daily check-in control and streak badge.
 export function HabitCard({ habit, checkedToday, onToggle, onEdit, onDelete }) {
@@ -8,12 +9,20 @@ export function HabitCard({ habit, checkedToday, onToggle, onEdit, onDelete }) {
     habit.target && habit.target > 1
       ? `Target ${habit.target}${habit.unit ? ` ${habit.unit}` : ''}`
       : habit.description
+  const color = getColorTag(habit.color, 'mint')
 
   return (
     <article
-      className="m3-card group flex items-center gap-3 rounded-3xl p-4 transition-all duration-200
-        hover:-translate-y-0.5 hover:shadow-m3-2"
+      className="m3-card group relative flex items-center gap-3 overflow-hidden rounded-3xl p-4 pl-5
+        transition-all duration-200 hover:-translate-y-0.5 hover:shadow-m3-2"
     >
+      {/* Color tag accent bar */}
+      <span
+        className="absolute inset-y-0 left-0 w-1.5"
+        style={{ backgroundColor: color.hex }}
+        aria-hidden="true"
+      />
+
       <button
         type="button"
         onClick={() => onToggle(habit)}
@@ -30,6 +39,11 @@ export function HabitCard({ habit, checkedToday, onToggle, onEdit, onDelete }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
+          <span
+            className="h-2 w-2 shrink-0 rounded-full"
+            style={{ backgroundColor: color.hex }}
+            aria-hidden="true"
+          />
           <h3 className="truncate text-sm font-medium text-on-surface">{habit.name}</h3>
           <StreakCounter streak={habit.currentStreak} />
         </div>

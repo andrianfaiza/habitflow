@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Modal } from '../common/Modal'
 import { Button } from '../common/Button'
 import { Input } from '../common/Input'
-import { PRIORITY_OPTIONS } from '../../utils/constants'
+import { ColorPicker } from '../common/ColorPicker'
+import { DEFAULT_TASK_COLOR, PRIORITY_OPTIONS } from '../../utils/constants'
 
 const EMPTY_FORM = {
   title: '',
   description: '',
   priority: 'medium',
+  color: DEFAULT_TASK_COLOR,
   due_date: '',
   due_time: '',
 }
@@ -19,16 +21,21 @@ function buildForm(task) {
     title: task.title ?? '',
     description: task.description ?? '',
     priority: task.priority ?? 'medium',
+    color: task.color ?? DEFAULT_TASK_COLOR,
     due_date: task.due_date ?? '',
     due_time: task.due_time ?? '',
   }
 }
 
 // Modal form used to create and edit a task.
-export function TaskForm({ open, onClose, onSubmit, initialTask = null }) {
+export function TaskForm({ open, onClose, onSubmit, initialTask = null, defaultDate = '' }) {
   // The parent remounts this component (via `key`) each time it opens, so the
   // state can be initialized directly from the task being edited.
-  const [form, setForm] = useState(() => buildForm(initialTask))
+  const [form, setForm] = useState(() => {
+    const base = buildForm(initialTask)
+    // Pre-fill the due date with the currently selected calendar day.
+    return initialTask ? base : { ...base, due_date: defaultDate || '' }
+  })
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
 
@@ -49,6 +56,7 @@ export function TaskForm({ open, onClose, onSubmit, initialTask = null }) {
         title: form.title.trim(),
         description: form.description.trim() || null,
         priority: form.priority,
+        color: form.color,
         due_date: form.due_date || null,
         due_time: form.due_time || null,
       })
@@ -114,6 +122,11 @@ export function TaskForm({ open, onClose, onSubmit, initialTask = null }) {
             ))}
           </select>
         </div>
+        <ColorPicker
+          label="Warna tugas"
+          value={form.color}
+          onChange={(color) => update('color', color)}
+        />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
             label="Tanggal jatuh tempo"

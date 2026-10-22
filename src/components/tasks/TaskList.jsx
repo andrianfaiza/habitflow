@@ -5,15 +5,24 @@ import { Loader } from '../common/Loader'
 import { Button } from '../common/Button'
 
 // Renders the task list, with loading and empty states.
-export function TaskList({ tasks, loading, onToggle, onEdit, onDelete, onAdd }) {
+export function TaskList({
+  tasks,
+  loading,
+  onToggle,
+  onEdit,
+  onDelete,
+  onAdd,
+  emptyTitle = 'Belum ada tugas hari ini',
+  emptyDescription = 'Yuk buat tugas pertamamu agar harimu lebih teratur!',
+}) {
   if (loading) return <Loader label="Memuat tugas..." />
 
   if (tasks.length === 0) {
     return (
       <EmptyState
         icon={ClipboardList}
-        title="Belum ada tugas hari ini"
-        description="Yuk buat tugas pertamamu agar harimu lebih teratur!"
+        title={emptyTitle}
+        description={emptyDescription}
         action={
           <Button size="sm" icon={Plus} onClick={onAdd}>
             Tambah Tugas

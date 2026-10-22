@@ -1,8 +1,8 @@
 import { Calendar, Check, Clock, Pencil, Trash2 } from 'lucide-react'
 import { Badge } from '../common/Badge'
 import {
+  getColorTag,
   PRIORITY_BADGE_STYLES,
-  PRIORITY_BAR_STYLES,
   PRIORITY_LABELS,
 } from '../../utils/constants'
 import { formatDueLabel, formatTime, isOverdue, isToday } from '../../utils/dateUtils'
@@ -11,6 +11,7 @@ import { formatDueLabel, formatTime, isOverdue, isToday } from '../../utils/date
 export function TaskCard({ task, onToggle, onEdit, onDelete }) {
   const overdue = !task.is_completed && isOverdue(task.due_date)
   const dueToday = !task.is_completed && isToday(task.due_date)
+  const color = getColorTag(task.color)
 
   return (
     <article
@@ -19,13 +20,13 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
           task.is_completed ? 'opacity-70' : ''
         }`}
     >
-      {/* Priority accent bar */}
+      {/* Color tag accent bar */}
       <span
         className={`absolute inset-y-0 left-0 w-1.5 ${
-          task.is_completed
-            ? 'bg-outline-variant'
-            : PRIORITY_BAR_STYLES[task.priority] ?? 'bg-outline'
+          task.is_completed ? 'bg-outline-variant' : ''
         }`}
+        style={task.is_completed ? undefined : { backgroundColor: color.hex }}
+        aria-hidden="true"
       />
 
       <button
@@ -44,13 +45,20 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <h3
-            className={`text-sm font-medium ${
-              task.is_completed ? 'text-on-surface-variant line-through' : 'text-on-surface'
-            }`}
-          >
-            {task.title}
-          </h3>
+          <div className="flex min-w-0 items-start gap-2">
+            <span
+              className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: color.hex }}
+              aria-hidden="true"
+            />
+            <h3
+              className={`text-sm font-medium ${
+                task.is_completed ? 'text-on-surface-variant line-through' : 'text-on-surface'
+              }`}
+            >
+              {task.title}
+            </h3>
+          </div>
           <div className="flex shrink-0 items-center gap-1 opacity-60 transition-opacity group-hover:opacity-100">
             <button
               type="button"

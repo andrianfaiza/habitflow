@@ -2,12 +2,15 @@ import { useState } from 'react'
 import { Modal } from '../common/Modal'
 import { Button } from '../common/Button'
 import { Input } from '../common/Input'
+import { ColorPicker } from '../common/ColorPicker'
+import { DEFAULT_HABIT_COLOR } from '../../utils/constants'
 
 const EMPTY_FORM = {
   name: '',
   description: '',
   target: '1',
   unit: '',
+  color: DEFAULT_HABIT_COLOR,
 }
 
 // Builds the initial form state from an optional habit.
@@ -18,6 +21,7 @@ function buildForm(habit) {
     description: habit.description ?? '',
     target: String(habit.target ?? 1),
     unit: habit.unit ?? '',
+    color: habit.color ?? DEFAULT_HABIT_COLOR,
   }
 }
 
@@ -48,6 +52,7 @@ export function HabitForm({ open, onClose, onSubmit, initialHabit = null }) {
         description: form.description.trim() || null,
         target: Number.isNaN(target) || target < 1 ? 1 : target,
         unit: form.unit.trim() || null,
+        color: form.color,
       })
       onClose()
     } catch (err) {
@@ -109,6 +114,11 @@ export function HabitForm({ open, onClose, onSubmit, initialHabit = null }) {
             onChange={(e) => update('unit', e.target.value)}
           />
         </div>
+        <ColorPicker
+          label="Warna kebiasaan"
+          value={form.color}
+          onChange={(color) => update('color', color)}
+        />
         {error ? <p className="text-sm text-error">{error}</p> : null}
       </form>
     </Modal>

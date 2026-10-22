@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, Flame, Pin, Plus, Target } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Flame, Pin, Plus, Target } from 'lucide-react'
 import { useData } from '../../hooks/useData'
 import { useProfile } from '../../hooks/useProfile'
 import { Button } from '../../components/common/Button'
@@ -10,8 +10,9 @@ import { TaskForm } from '../../components/tasks/TaskForm'
 import { PriorityFilter } from '../../components/tasks/PriorityFilter'
 import { HabitList } from '../../components/habits/HabitList'
 import { HabitForm } from '../../components/habits/HabitForm'
+import { TopbarCalendar } from '../../components/calendar/TopbarCalendar'
 import { CONTENT_FILTERS, resolvePreferences } from '../../utils/constants'
-import { getGreeting, todayKey } from '../../utils/dateUtils'
+import { formatShortDate, fromDateKey, getGreeting, todayKey } from '../../utils/dateUtils'
 import { playCompletionSound } from '../../utils/soundUtils'
 
 // Main dashboard combining the habit tracker and the to-do list.
@@ -38,28 +39,53 @@ export function Home() {
 
   const [contentFilter, setContentFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
+  const [selectedDate, setSelectedDate] = useState(todayKey())
   const [taskModal, setTaskModal] = useState({ open: false, task: null })
   const [habitModal, setHabitModal] = useState({ open: false, habit: null })
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [actionError, setActionError] = useState(null)
 
   const displayName = profile?.full_name?.trim() || 'Sahabat'
+  const today = todayKey()
+  const isTodayView = selectedDate === today
+  const periodLabel = isTodayView ? 'Hari Ini' : formatShortDate(fromDateKey(selectedDate))
 
-  // Daily progress summary.
+  // Tasks for the selected calendar day. Today also shows overdue and
+  // undated tasks that are still pending, so nothing gets lost.
+  const dateScopedTasks = useMemo(() => {
+    if (selectedDate === today) {
+      return tasks.filter((task) => {
+        if (!task.due_date) return !task.is_completed
+        if (task.due_date === today) return true
+        return task.due_date < today && !task.is_completed
+      })
+    }
+    return tasks.filter((task) => task.due_date === selectedDate)
+  }, [tasks, selectedDate, today])
+
+  const overdueCount = useMemo(
+    () =>
+      tasks.filter(
+        (task) => !task.is_completed && task.due_date && task.due_date < today,
+      ).length,
+    [tasks, today],
+  )
+
+  // Progress summary for the selected day.
   const stats = useMemo(() => {
-    const total = tasks.length
-    const completed = tasks.filter((task) => task.is_completed).length
+    const total = dateScopedTasks.length
+    const completed = dateScopedTasks.filter((task) => task.is_completed).length
     const remaining = total - completed
     const percent = total === 0 ? 0 : Math.round((completed / total) * 100)
     const streak = habits.reduce((max, habit) => Math.max(max, habit.currentStreak), 0)
     return { total, completed, remaining, percent, streak }
-  }, [tasks, habits])
+  }, [dateScopedTasks, habits])
 
-  // Apply the priority filter to the task list.
+  // Apply the priority filter to the date-filtered task list.
   const filteredTasks = useMemo(() => {
-    if (priorityFilter === 'all') return tasks
-    return tasks.filter((task) => task.priority === priorityFilter)
-  }, [tasks, priorityFilter])
+    if (priorityFilter === 'all') return dateScopedTasks
+    return dateScopedTasks.filter((task) => task.priority === priorityFilter)
+  }, [dateScopedTasks, priorityFilter])
 
   const showHabits = contentFilter === 'all' || contentFilter === 'habits'
   const showTasks = contentFilter === 'all' || contentFilter === 'todo'
@@ -142,15 +168,29 @@ export function Home() {
         </Button>
       </section>
 
+      {/* Topbar calendar + date filter */}
+      <TopbarCalendar
+        selectedDate={selectedDate}
+        onSelect={setSelectedDate}
+        tasks={tasks}
+        habits={habits}
+      />
+
       {/* Daily progress summary card */}
       <section className="m3-card flex flex-col items-center gap-6 rounded-3xl bg-gradient-to-br from-primary-container/60 to-surface p-6 shadow-m3-2 sm:gap-10 sm:p-8 md:flex-row">
         <ProgressRing percent={stats.percent} />
         <div className="flex-1 text-center md:text-left">
-          <h3 className="text-lg font-semibold text-on-surface">Progres Hari Ini</h3>
+          <h3 className="text-lg font-semibold text-on-surface">Progres {periodLabel}</h3>
           <p className="mt-1 text-sm text-on-surface-variant">
             {stats.total === 0
-              ? 'Belum ada tugas. Mulai dengan menambah tugas pertamamu.'
-              : `${stats.percent}% tugas hari ini telah selesai.`}
+              ? isTodayView
+                ? 'Belum ada tugas untuk hari ini. Mulai dengan menambah tugas pertamamu.'
+                : `Belum ada tugas dengan tenggat ${periodLabel}.`
+              : isTodayView
+                ? `${stats.percent}% tugas hari ini telah selesai${
+                    overdueCount > 0 ? ' (termasuk tugas yang menunggak).' : '.'
+                  }`
+                : `${stats.percent}% tugas pada ${periodLabel} telah selesai.`}
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 md:justify-start">
             <StatChip icon={Flame} label={`${stats.streak} Hari Streak`} />
@@ -229,8 +269,21 @@ export function Home() {
                 Tugas
               </Button>
             </div>
-            {/* Priority filter sits directly above the task column */}
-            <PriorityFilter value={priorityFilter} onChange={setPriorityFilter} />
+            {/* Priority filter and the selected date context */}
+            <div className="flex min-h-[2.25rem] flex-wrap items-center justify-between gap-2">
+              <PriorityFilter value={priorityFilter} onChange={setPriorityFilter} />
+              <div className="flex items-center gap-2">
+                {isTodayView && overdueCount > 0 ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-error-container px-2.5 py-1 text-[11px] font-medium text-on-error-container">
+                    <AlertCircle size={12} />
+                    {overdueCount} menunggak
+                  </span>
+                ) : null}
+                <span className="text-[11px] font-medium text-on-surface-variant">
+                  {periodLabel}
+                </span>
+              </div>
+            </div>
             <TaskList
               tasks={filteredTasks}
               loading={tasksLoading}
@@ -238,6 +291,14 @@ export function Home() {
               onEdit={(task) => setTaskModal({ open: true, task })}
               onDelete={(task) => setConfirmDelete({ type: 'task', item: task })}
               onAdd={() => setTaskModal({ open: true, task: null })}
+              emptyTitle={
+                isTodayView ? 'Belum ada tugas hari ini' : 'Tidak ada tugas di tanggal ini'
+              }
+              emptyDescription={
+                isTodayView
+                  ? 'Yuk buat tugas pertamamu agar harimu lebih teratur!'
+                  : 'Pilih tanggal lain atau tambahkan tugas baru untuk tanggal ini.'
+              }
             />
           </div>
         ) : null}
@@ -248,6 +309,7 @@ export function Home() {
         key={taskModal.open ? `task-${taskModal.task?.id ?? 'new'}` : 'task-closed'}
         open={taskModal.open}
         initialTask={taskModal.task}
+        defaultDate={selectedDate}
         onClose={() => setTaskModal({ open: false, task: null })}
         onSubmit={submitTask}
       />
