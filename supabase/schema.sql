@@ -20,6 +20,7 @@ create table if not exists public.tasks (
   description   text,
   priority      text not null default 'medium'
                 check (priority in ('high', 'medium', 'low')),
+  color         text not null default 'lavender',
   due_date      date,
   due_time      time,
   is_completed  boolean not null default false,
@@ -28,6 +29,13 @@ create table if not exists public.tasks (
 );
 
 create index if not exists tasks_user_id_idx on public.tasks (user_id);
+
+-- Adds the color tag to tasks created before this column existed.
+alter table public.tasks add column if not exists color text not null default 'lavender';
+
+alter table public.tasks drop constraint if exists tasks_color_check;
+alter table public.tasks add constraint tasks_color_check
+  check (color in ('orange', 'lavender', 'blue', 'mint', 'amber', 'pink'));
 
 -- ------------------------------------------------------------
 -- HABITS
@@ -39,10 +47,18 @@ create table if not exists public.habits (
   description text,
   target      integer not null default 1,
   unit        text,
+  color       text not null default 'mint',
   created_at  timestamptz not null default now()
 );
 
 create index if not exists habits_user_id_idx on public.habits (user_id);
+
+-- Adds the color tag to habits created before this column existed.
+alter table public.habits add column if not exists color text not null default 'mint';
+
+alter table public.habits drop constraint if exists habits_color_check;
+alter table public.habits add constraint habits_color_check
+  check (color in ('orange', 'lavender', 'blue', 'mint', 'amber', 'pink'));
 
 -- ------------------------------------------------------------
 -- HABIT LOGS (one row per habit per day)
