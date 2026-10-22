@@ -46,6 +46,30 @@ export function addDays(dateKey, amount) {
   return toDateKey(date)
 }
 
+// Adds (or subtracts) months to a date key. The day is clamped to the last day
+// of the target month (e.g. Jan 31 + 1 month -> Feb 28).
+export function addMonths(dateKey, amount) {
+  const date = fromDateKey(dateKey)
+  const day = date.getDate()
+  date.setDate(1)
+  date.setMonth(date.getMonth() + amount)
+  const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+  date.setDate(Math.min(day, daysInMonth))
+  return toDateKey(date)
+}
+
+// Inclusive list of "YYYY-MM-DD" keys between two date keys.
+export function buildDateRange(startKey, endKey) {
+  const keys = []
+  let cursor = startKey
+  // The length guard prevents an accidental endless loop.
+  while (diffInDays(cursor, endKey) <= 0 && keys.length < 5000) {
+    keys.push(cursor)
+    cursor = addDays(cursor, 1)
+  }
+  return keys
+}
+
 // Difference in whole days between two keys (a - b).
 export function diffInDays(aKey, bKey) {
   const MS_PER_DAY = 1000 * 60 * 60 * 24
@@ -78,6 +102,24 @@ export function getGreeting(date = new Date()) {
   if (hour < 15) return 'Selamat siang'
   if (hour < 19) return 'Selamat sore'
   return 'Selamat malam'
+}
+
+// Indonesian month name for a Date or a "YYYY-MM-DD" key.
+export function getMonthName(date = new Date()) {
+  const d = date instanceof Date ? date : fromDateKey(date)
+  return MONTH_NAMES_ID[d.getMonth()]
+}
+
+// Calendar year for a Date or a "YYYY-MM-DD" key.
+export function getYear(date = new Date()) {
+  const d = date instanceof Date ? date : fromDateKey(date)
+  return d.getFullYear()
+}
+
+// Short Indonesian weekday, e.g. "Sen".
+export function getWeekdayShort(date = new Date()) {
+  const d = date instanceof Date ? date : fromDateKey(date)
+  return WEEKDAY_NAMES_ID[d.getDay()].slice(0, 3)
 }
 
 // Checks whether a due date is in the past (and not today).
