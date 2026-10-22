@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckCircle2, Flame, KeyRound, Mail, Save, Target } from 'lucide-react'
+import { CheckCircle2, Flame, KeyRound, Mail, RefreshCw, Save, Target } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useData } from '../../hooks/useData'
 import { useProfile } from '../../hooks/useProfile'
@@ -7,13 +7,16 @@ import { Button } from '../../components/common/Button'
 import { Input } from '../../components/common/Input'
 import { Avatar } from '../../components/common/Avatar'
 import { Loader } from '../../components/common/Loader'
+import { HabitHeatmap } from '../../components/habits/HabitHeatmap'
 import { AVATAR_PRESETS } from '../../utils/constants'
 import { formatShortDate } from '../../utils/dateUtils'
 
 // Profile page: account summary, avatar, display info and password.
 export function UserProfile() {
-  const { profile, loading, error } = useProfile()
+  const { profile, loading, error, reload } = useProfile()
+  const { user } = useAuth()
 
+  // Show a loader while the profile request is in flight.
   if (loading) {
     return (
       <div className="flex justify-center py-16">
@@ -22,23 +25,36 @@ export function UserProfile() {
     )
   }
 
+  // Surface profile loading errors inline.
   if (error) {
     return (
-      <p className="mx-auto max-w-2xl rounded-m3-sm bg-error-container px-4 py-3 text-sm text-on-error-container">
+      <div className="mx-auto max-w-2xl rounded-m3-sm bg-error-container px-4 py-3 text-sm text-on-error-container">
         {error}
-      </p>
+      </div>
     )
   }
 
-  if (!profile) return null
+  // Never render an empty page when the request resolves without a row.
+  if (!profile) {
+    return (
+      <div className="m3-card mx-auto flex max-w-md flex-col items-center gap-4 rounded-3xl p-8 text-center">
+        <p className="text-sm text-on-surface-variant">
+          Profil belum tersedia. Coba muat ulang data profil.
+        </p>
+        <Button variant="tonal" icon={RefreshCw} onClick={() => reload()}>
+          Muat Ulang Profil
+        </Button>
+      </div>
+    )
+  }
 
   // Keyed by id so form state initializes correctly once the row loads.
-  return <ProfileContent key={profile.id} profile={profile} />
+  return <ProfileContent key={profile.id || user?.id} profile={profile} />
 }
 
 function ProfileContent({ profile }) {
   const { user, updatePassword } = useAuth()
-  const { habits, tasks } = useData()
+  const { habits = [], tasks = [], habitLogs = [] } = useData() // Safe fallback arrays
   const { saveProfile } = useProfile()
 
   const [fullName, setFullName] = useState(profile.full_name ?? '')
@@ -54,7 +70,7 @@ function ProfileContent({ profile }) {
 
   const stats = {
     totalHabits: habits.length,
-    completedTasks: tasks.filter((task) => task.is_completed).length,
+    completedTasks: tasks.filter((task) => task.is_completed || task.completed).length,
     highestStreak: habits.reduce((max, habit) => Math.max(max, habit.bestStreak ?? 0), 0),
   }
 
@@ -113,7 +129,7 @@ function ProfileContent({ profile }) {
   }
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6">
+    <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <h2 className="text-xl font-semibold text-on-surface">Profil Pengguna</h2>
 
       {/* Summary card */}
@@ -134,6 +150,17 @@ function ProfileContent({ profile }) {
         <StatCard icon={Target} label="Total Habits" value={stats.totalHabits} />
         <StatCard icon={CheckCircle2} label="Completed Tasks" value={stats.completedTasks} />
         <StatCard icon={Flame} label="Highest Streak" value={`${stats.highestStreak} hari`} />
+      </section>
+
+      {/* Habit contribution heatmap */}
+      <section className="m3-card rounded-3xl p-6 shadow-m3-1">
+        <h3 className="text-base font-semibold text-on-surface">Kontribusi Habit</h3>
+        <p className="mt-1 text-sm text-on-surface-variant">
+          Intensitas check-in habit selama 12 bulan terakhir.
+        </p>
+        <div className="mt-5">
+          <HabitHeatmap logs={habitLogs} />
+        </div>
       </section>
 
       {/* Avatar picker */}
