@@ -8,6 +8,8 @@ import {
   getMonthName,
   getWeekdayShort,
   getYear,
+  getDate,
+  getWeekday,
   todayKey,
 } from '../../utils/dateUtils'
 import {
@@ -36,7 +38,7 @@ function buildInitialRange() {
 export function TopbarCalendar({ selectedDate, onSelect, tasks = [], habits = [] }) {
   const [dateKeys, setDateKeys] = useState(buildInitialRange)
   const [centerDate, setCenterDate] = useState(selectedDate || todayKey())
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false)
 
   const scrollRef = useRef(null)
   const dateKeysRef = useRef(dateKeys)
@@ -210,7 +212,7 @@ export function TopbarCalendar({ selectedDate, onSelect, tasks = [], habits = []
 
   return (
     <section className="m3-card overflow-hidden rounded-3xl shadow-m3-1">
-      {/* Header: year, month and controls */}
+      {/* Header: year, month, Date and controls */}
       <div className="flex items-start justify-between gap-3 px-5 pb-3 pt-5 sm:px-6">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-on-surface-variant">
@@ -218,26 +220,33 @@ export function TopbarCalendar({ selectedDate, onSelect, tasks = [], habits = []
           </p>
           <h3 className="truncate text-xl font-semibold text-on-surface sm:text-2xl">
             {getMonthName(center)}
+            {!expanded ? (<>
+            , {getDate(center)} {getWeekday(center)}
+            </>) : null}
           </h3>
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
+          {expanded ? (
+            <>
           <button
             type="button"
             onClick={handleToday}
             className="inline-flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-2 text-xs font-semibold text-on-primary-container transition-colors hover:bg-primary-container/80"
-          >
+            >
             <CalendarDays size={14} />
-            <span className="hidden sm:inline">Hari Ini</span>
+            <span className="hidden sm:inline">Today</span>
           </button>
-          <IconButton label="Minggu sebelumnya" onClick={() => nudge(-7)}>
+          <IconButton label="Previous week" onClick={() => nudge(-7)}>
             <ChevronLeft size={16} />
           </IconButton>
-          <IconButton label="Minggu berikutnya" onClick={() => nudge(7)}>
+          <IconButton label="Next week" onClick={() => nudge(7)}>
             <ChevronRight size={16} />
           </IconButton>
+            </>
+          ) : null}
           <IconButton
-            label={expanded ? 'Sembunyikan kalender' : 'Tampilkan kalender'}
+            label={expanded ? 'Hide calendar' : 'Show calendar'}
             onClick={() => setExpanded((prev) => !prev)}
           >
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -278,7 +287,7 @@ const DateStrip = memo(function DateStrip({
       onScroll={onScroll}
       className="m3-scrollbar flex gap-2 overflow-x-auto pb-5 pt-1"
       role="listbox"
-      aria-label="Pilih tanggal"
+      aria-label="Select a date"
     >
       {dateKeys.map((key) => {
         const date = fromDateKey(key)
@@ -293,7 +302,7 @@ const DateStrip = memo(function DateStrip({
             type="button"
             role="option"
             aria-selected={isSelected}
-            aria-label={`Pilih ${date.getDate()} ${getMonthName(date)} ${getYear(date)}`}
+            aria-label={`Select ${date.getDate()} ${getMonthName(date)} ${getYear(date)}`}
             onClick={() => onSelect(key)}
             style={{ width: CARD_WIDTH }}
             className={`flex h-[68px] shrink-0 flex-col items-center justify-center gap-1 rounded-2xl border transition-all duration-200 ${
