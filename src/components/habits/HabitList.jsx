@@ -7,17 +7,17 @@ import { todayKey } from '../../utils/dateUtils'
 
 // Renders the habit list, with loading and empty states.
 export function HabitList({ habits, logs, loading, onToggle, onEdit, onDelete, onAdd }) {
-  if (loading) return <Loader label="Memuat kebiasaan..." />
+  if (loading) return <Loader label="Loading habits..." />
 
   if (habits.length === 0) {
     return (
       <EmptyState
         icon={Target}
-        title="Belum ada kebiasaan"
-        description="Mulai bangun rutinitas pertamamu hari ini!"
+        title="No habits yet"
+        description="Start building your first routine today!"
         action={
           <Button size="sm" icon={Plus} onClick={onAdd}>
-            Tambah Kebiasaan
+            Add Habit
           </Button>
         }
       />

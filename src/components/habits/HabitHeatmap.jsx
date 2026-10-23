@@ -18,7 +18,7 @@ const HEATMAP_THEME = {
   dark: ['#1b241d', '#244a2e', '#2f7a43', '#43a95a', '#7bd88f'],
 }
 
-const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // Maps a daily check-in count to one of the five intensity levels.
 function toLevel(count, maxCount) {
@@ -65,10 +65,10 @@ export function HabitHeatmap({ logs = [] }) {
   return (
     <div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <HeatStat icon={CalendarCheck} label="Total Check-in" value={stats.totalCheckIns} />
-        <HeatStat icon={CalendarDays} label="Hari Aktif" value={stats.activeDays} />
-        <HeatStat icon={Flame} label="Streak Saat Ini" value={`${stats.currentStreak} hari`} />
-        <HeatStat icon={Trophy} label="Streak Terbaik" value={`${stats.bestStreak} hari`} />
+        <HeatStat icon={CalendarCheck} label="Total Check-ins" value={stats.totalCheckIns} />
+        <HeatStat icon={CalendarDays} label="Active Days" value={stats.activeDays} />
+        <HeatStat icon={Flame} label="Current Streak" value={`${stats.currentStreak} days`} />
+        <HeatStat icon={Trophy} label="Best Streak" value={`${stats.bestStreak} days`} />
       </div>
 
       <div className="m3-scrollbar mt-5 overflow-x-auto pb-1">
@@ -87,22 +87,22 @@ export function HabitHeatmap({ logs = [] }) {
           showTotalCount={false}
           labels={{
             months: MONTH_LABELS,
-            weekdays: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-            legend: { less: 'Sedikit', more: 'Banyak' },
+            weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            legend: { less: 'Less', more: 'More' },
           }}
           tooltips={{
             activity: {
               text: (activity) =>
-                `${activity.count} check-in • ${formatDisplayDate(fromDateKey(activity.date))}`,
+                `${activity.count} check-ins • ${formatDisplayDate(fromDateKey(activity.date))}`,
             },
-            colorLegend: { text: (level) => `Intensitas ${level}` },
+            colorLegend: { text: (level) => `Intensity ${level}` },
           }}
         />
       </div>
 
       <p className="mt-3 text-xs text-on-surface-variant">
-        Setiap kotak mewakili satu hari. Warna makin gelap saat makin banyak habit yang
-        dicentang pada hari itu.
+        Each square represents one day. The color gets darker the more habits you
+        checked in on that day.
       </p>
     </div>
   )

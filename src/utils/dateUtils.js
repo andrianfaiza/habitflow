@@ -2,22 +2,22 @@
 // Habit log dates are always handled as local "YYYY-MM-DD" strings so the
 // value never shifts between the user's device and the Supabase server.
 
-const MONTH_NAMES_ID = [
-  'Januari',
-  'Februari',
-  'Maret',
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
   'April',
-  'Mei',
-  'Juni',
-  'Juli',
-  'Agustus',
+  'May',
+  'June',
+  'July',
+  'August',
   'September',
-  'Oktober',
+  'October',
   'November',
-  'Desember',
+  'December',
 ]
 
-const WEEKDAY_NAMES_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 // Converts a Date (or date-like value) into a local "YYYY-MM-DD" key.
 export function toDateKey(date = new Date()) {
@@ -78,36 +78,46 @@ export function diffInDays(aKey, bKey) {
   return Math.round((a - b) / MS_PER_DAY)
 }
 
-// Human friendly Indonesian date, e.g. "18 Oktober 2026".
+// Human friendly English date, e.g. "18 October 2026".
 export function formatDisplayDate(date = new Date(), { withWeekday = false } = {}) {
   const d = date instanceof Date ? date : new Date(date)
   const day = d.getDate()
-  const month = MONTH_NAMES_ID[d.getMonth()]
+  const month = MONTH_NAMES[d.getMonth()]
   const year = d.getFullYear()
   const base = `${day} ${month} ${year}`
-  return withWeekday ? `${WEEKDAY_NAMES_ID[d.getDay()]}, ${base}` : base
+  return withWeekday ? `${WEEKDAY_NAMES[d.getDay()]}, ${base}` : base
 }
 
-// Formats a "HH:MM:SS" time string into "HH:MM WIB".
+// Formats a "HH:MM:SS" time string into "HH:MM".
 export function formatTime(time) {
   if (!time) return null
   const [hours, minutes] = time.split(':')
-  return `${hours}:${minutes} WIB`
+  return `${hours}:${minutes}`
 }
 
 // Greeting based on the current hour of the day.
 export function getGreeting(date = new Date()) {
   const hour = (date instanceof Date ? date : new Date(date)).getHours()
-  if (hour < 11) return 'Selamat pagi'
-  if (hour < 15) return 'Selamat siang'
-  if (hour < 19) return 'Selamat sore'
-  return 'Selamat malam'
+  if (hour < 11) return 'Good morning'
+  if (hour < 15) return 'Good afternoon'
+  if (hour < 19) return 'Good evening'
+  return 'Good night'
 }
 
-// Indonesian month name for a Date or a "YYYY-MM-DD" key.
+// English day for a Date or a "YYYY-MM-DD" key.
+export function getDay(date = new Date()) {
+  const d = date instanceof Date ? date : fromDateKey(date)
+  return [d.getDate()]
+}
+// English date for a Date or a "YYYY-MM-DD" key.
+export function getDate(date = new Date()) {
+  const d = date instanceof Date ? date : fromDateKey(date)
+  return [d.getDate()]
+}
+// English month name for a Date or a "YYYY-MM-DD" key.
 export function getMonthName(date = new Date()) {
   const d = date instanceof Date ? date : fromDateKey(date)
-  return MONTH_NAMES_ID[d.getMonth()]
+  return MONTH_NAMES[d.getMonth()]
 }
 
 // Calendar year for a Date or a "YYYY-MM-DD" key.
@@ -116,10 +126,15 @@ export function getYear(date = new Date()) {
   return d.getFullYear()
 }
 
-// Short Indonesian weekday, e.g. "Sen".
+// Short English weekday, e.g. "Monday".
+export function getWeekday(date = new Date()) {
+  const d = date instanceof Date ? date : fromDateKey(date)
+  return WEEKDAY_NAMES[d.getDay()]
+}
+// Short English weekday, e.g. "Mon".
 export function getWeekdayShort(date = new Date()) {
   const d = date instanceof Date ? date : fromDateKey(date)
-  return WEEKDAY_NAMES_ID[d.getDay()].slice(0, 3)
+  return WEEKDAY_NAMES[d.getDay()].slice(0, 3)
 }
 
 // Checks whether a due date is in the past (and not today).
@@ -140,19 +155,19 @@ export function isTomorrow(dateKey) {
   return dateKey === addDays(todayKey(), 1)
 }
 
-// Short Indonesian date, e.g. "18 Okt 2026".
+// Short English date, e.g. "18 Oct 2026".
 export function formatShortDate(date) {
   const d = date instanceof Date ? date : new Date(date)
   const day = d.getDate()
-  const month = MONTH_NAMES_ID[d.getMonth()].slice(0, 3)
+  const month = MONTH_NAMES[d.getMonth()].slice(0, 3)
   const year = d.getFullYear()
   return `${day} ${month} ${year}`
 }
 
-// Friendly label for a due date: "Hari ini", "Besok" or the short date.
+// Friendly label for a due date: "Today", "Tomorrow" or the short date.
 export function formatDueLabel(dateKey) {
   if (!dateKey) return null
-  if (isToday(dateKey)) return 'Hari ini'
-  if (isTomorrow(dateKey)) return 'Besok'
+  if (isToday(dateKey)) return 'Today'
+  if (isTomorrow(dateKey)) return 'Tomorrow'
   return formatShortDate(fromDateKey(dateKey))
 }

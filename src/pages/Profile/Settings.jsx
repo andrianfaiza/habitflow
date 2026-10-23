@@ -43,7 +43,7 @@ export function Settings() {
     try {
       await savePreferences(next)
     } catch (err) {
-      setStatus({ type: 'error', message: err.message ?? 'Gagal menyimpan preferensi.' })
+      setStatus({ type: 'error', message: err.message ?? 'Failed to save preferences.' })
     }
   }
 
@@ -61,9 +61,9 @@ export function Settings() {
       anchor.click()
       anchor.remove()
       URL.revokeObjectURL(url)
-      setStatus({ type: 'success', message: 'Data berhasil diekspor.' })
+      setStatus({ type: 'success', message: 'Data exported successfully.' })
     } catch (err) {
-      setStatus({ type: 'error', message: err.message ?? 'Gagal mengekspor data.' })
+      setStatus({ type: 'error', message: err.message ?? 'Failed to export the data.' })
     }
   }
 
@@ -75,7 +75,7 @@ export function Settings() {
       if (dialog === 'reset') {
         await resetUserData(user.id)
         await Promise.all([reloadTasks(), reloadHabits()])
-        setStatus({ type: 'success', message: 'Semua data tugas dan kebiasaan telah dihapus.' })
+        setStatus({ type: 'success', message: 'All tasks and habits have been deleted.' })
       } else if (dialog === 'delete') {
         await deleteAccount()
         await signOut()
@@ -83,7 +83,7 @@ export function Settings() {
       }
       setDialog(null)
     } catch (err) {
-      setStatus({ type: 'error', message: err.message ?? 'Terjadi kesalahan.' })
+      setStatus({ type: 'error', message: err.message ?? 'Something went wrong.' })
     } finally {
       setProcessing(false)
     }
@@ -91,7 +91,7 @@ export function Settings() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <h2 className="text-xl font-semibold text-on-surface">Pengaturan</h2>
+      <h2 className="text-xl font-semibold text-on-surface">Settings</h2>
 
       {status ? (
         <p
@@ -107,9 +107,9 @@ export function Settings() {
 
       {/* Appearance */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Tampilan</h3>
+        <h3 className="text-base font-semibold text-on-surface">Appearance</h3>
         <p className="mt-1 text-sm text-on-surface-variant">
-          Pilih tema yang paling nyaman untuk matamu.
+          Choose the theme that is most comfortable for your eyes.
         </p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <button
@@ -122,7 +122,7 @@ export function Settings() {
             }`}
           >
             <Sun size={22} className="text-primary" />
-            <span className="text-sm font-medium text-on-surface">Mode Terang</span>
+            <span className="text-sm font-medium text-on-surface">Light Mode</span>
           </button>
           <button
             type="button"
@@ -134,11 +134,11 @@ export function Settings() {
             }`}
           >
             <Moon size={22} className="text-primary" />
-            <span className="text-sm font-medium text-on-surface">Mode Gelap</span>
+            <span className="text-sm font-medium text-on-surface">Dark Mode</span>
           </button>
         </div>
         <p className="mt-3 text-xs text-on-surface-variant">
-          Tema saat ini: {isDark ? 'Gelap' : 'Terang'}
+          Current theme: {isDark ? 'Dark' : 'Light'}
         </p>
       </section>
 
@@ -146,24 +146,24 @@ export function Settings() {
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
         <h3 className="flex items-center gap-2 text-base font-semibold text-on-surface">
           <Bell size={18} className="text-primary" />
-          Preferensi Notifikasi
+          Notification Preferences
         </h3>
         <div className="mt-4 flex flex-col gap-4">
           <Toggle
-            label="Pengingat Habit"
-            description="Tampilkan notifikasi untuk habit yang belum dicentang hari ini."
+            label="Habit Reminders"
+            description="Show notifications for habits that have not been checked in today."
             checked={preferences.notifications.habitReminders}
             onChange={(value) => updatePreference('notifications', 'habitReminders', value)}
           />
           <Toggle
-            label="Tenggat Tugas"
-            description="Ingatkan tugas yang jatuh tempo hari ini atau besok."
+            label="Task Deadlines"
+            description="Remind you about tasks that are due today or tomorrow."
             checked={preferences.notifications.taskDeadlines}
             onChange={(value) => updatePreference('notifications', 'taskDeadlines', value)}
           />
           <Toggle
-            label="Notifikasi Email"
-            description="Terima ringkasan pengingat melalui email."
+            label="Email Notifications"
+            description="Receive a reminder summary by email."
             checked={preferences.notifications.email}
             onChange={(value) => updatePreference('notifications', 'email', value)}
           />
@@ -174,12 +174,12 @@ export function Settings() {
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
         <h3 className="flex items-center gap-2 text-base font-semibold text-on-surface">
           <Volume2 size={18} className="text-primary" />
-          Suara &amp; Efek
+          Sound &amp; Effects
         </h3>
         <div className="mt-4 flex flex-col gap-4">
           <Toggle
-            label="Efek Suara Penyelesaian"
-            description="Mainkan nada singkat saat menandai tugas atau habit selesai."
+            label="Completion Sound Effect"
+            description="Play a short tone when you mark a task or habit as done."
             checked={preferences.sound.completionSound}
             onChange={(value) => updatePreference('sound', 'completionSound', value)}
           />
@@ -188,21 +188,21 @@ export function Settings() {
 
       {/* Data management */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Manajemen Data</h3>
+        <h3 className="text-base font-semibold text-on-surface">Data Management</h3>
         <p className="mt-1 text-sm text-on-surface-variant">
-          Ekspor cadangan datamu atau bersihkan data dari akun ini.
+          Export a backup of your data or clear the data from this account.
         </p>
 
         <div className="mt-4 flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-outline-variant p-4">
             <div>
-              <p className="text-sm font-medium text-on-surface">Ekspor Data</p>
+              <p className="text-sm font-medium text-on-surface">Export Data</p>
               <p className="text-xs text-on-surface-variant">
-                Unduh semua tugas, kebiasaan, dan log sebagai JSON.
+                Download all tasks, habits, and logs as JSON.
               </p>
             </div>
             <Button variant="outlined" icon={Download} onClick={handleExport}>
-              Ekspor
+              Export
             </Button>
           </div>
 
@@ -210,7 +210,7 @@ export function Settings() {
             <div>
               <p className="text-sm font-medium text-on-surface">Reset Data</p>
               <p className="text-xs text-on-surface-variant">
-                Hapus semua tugas dan kebiasaan. Akun tetap aktif.
+                Delete all tasks and habits. Your account stays active.
               </p>
             </div>
             <Button variant="danger-text" icon={RotateCcw} onClick={() => setDialog('reset')}>
@@ -220,13 +220,13 @@ export function Settings() {
 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-error/40 bg-error/5 p-4">
             <div>
-              <p className="text-sm font-medium text-error">Hapus Akun</p>
+              <p className="text-sm font-medium text-error">Delete Account</p>
               <p className="text-xs text-on-surface-variant">
-                Hapus akun beserta seluruh datamu secara permanen.
+                Permanently delete your account and all of its data.
               </p>
             </div>
             <Button variant="danger" icon={Trash2} onClick={() => setDialog('delete')}>
-              Hapus Akun
+              Delete Account
             </Button>
           </div>
         </div>
@@ -234,13 +234,13 @@ export function Settings() {
 
       {/* Account */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Akun</h3>
+        <h3 className="text-base font-semibold text-on-surface">Account</h3>
         <p className="mt-1 text-sm text-on-surface-variant">
-          Masuk sebagai <span className="font-medium text-on-surface">{user?.email}</span>
+          Signed in as <span className="font-medium text-on-surface">{user?.email}</span>
         </p>
         <div className="mt-4">
           <Button variant="outlined" icon={LogOut} onClick={signOut}>
-            Keluar dari akun
+            Sign out
           </Button>
         </div>
       </section>
@@ -255,8 +255,8 @@ export function Settings() {
         onConfirm={handleConfirm}
         loading={processing}
         title="Reset Data"
-        message="Semua tugas dan kebiasaanmu akan dihapus permanen. Akun dan profil tetap tersimpan. Lanjutkan?"
-        confirmLabel="Ya, Reset Data"
+        message="All your tasks and habits will be permanently deleted. Your account and profile will be kept. Continue?"
+        confirmLabel="Yes, Reset Data"
       />
 
       <ConfirmDialog
@@ -264,9 +264,9 @@ export function Settings() {
         onClose={() => setDialog(null)}
         onConfirm={handleConfirm}
         loading={processing}
-        title="Hapus Akun"
-        message="Akun beserta seluruh tugas, kebiasaan, dan log akan dihapus permanen dan tidak dapat dikembalikan. Yakin ingin melanjutkan?"
-        confirmLabel="Ya, Hapus Akun"
+        title="Delete Account"
+        message="Your account along with all tasks, habits, and logs will be permanently deleted and cannot be recovered. Are you sure you want to continue?"
+        confirmLabel="Yes, Delete Account"
       />
     </div>
   )

@@ -15,6 +15,9 @@ import { CONTENT_FILTERS, resolvePreferences } from '../../utils/constants'
 import { formatShortDate, fromDateKey, getGreeting, todayKey } from '../../utils/dateUtils'
 import { playCompletionSound } from '../../utils/soundUtils'
 
+// Shared empty set so the session overlay keeps a stable identity.
+const EMPTY_SET = new Set()
+
 // Main dashboard combining the habit tracker and the to-do list.
 export function Home() {
   const {
@@ -45,10 +48,24 @@ export function Home() {
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [actionError, setActionError] = useState(null)
 
-  const displayName = profile?.full_name?.trim() || 'Sahabat'
+  // Ids of the tasks completed during the current session. They keep their
+  // "done" state (strikethrough, dimmed card) until the user switches the
+  // selected day or reloads the app.
+  const [sessionCompleted, setSessionCompleted] = useState(() => ({
+    day: todayKey(),
+    ids: new Set(),
+  }))
+
+  const displayName = profile?.full_name?.trim() || 'friend'
   const today = todayKey()
   const isTodayView = selectedDate === today
-  const periodLabel = isTodayView ? 'Hari Ini' : formatShortDate(fromDateKey(selectedDate))
+  const periodLabel = isTodayView ? 'Today' : formatShortDate(fromDateKey(selectedDate))
+
+  // The overlay resets by itself once the calendar day rolls over.
+  const sessionCompletedIds = useMemo(
+    () => (sessionCompleted.day === today ? sessionCompleted.ids : EMPTY_SET),
+    [sessionCompleted, today],
+  )
 
   // Tasks for the selected calendar day. Today also shows overdue and
   // undated tasks that are still pending, so nothing gets lost.
@@ -60,6 +77,13 @@ export function Home() {
         return task.due_date < today && !task.is_completed
       })
     }
+    return tasks.filter((task) => task.due_date === selectedDate)
+  }, [tasks, selectedDate, today])
+
+  // Tasks rendered by the task list. The "Today" view feeds the smart view
+  // (overdue + today + upcoming); any other date stays scoped to that day.
+  const listTasks = useMemo(() => {
+    if (selectedDate === today) return tasks
     return tasks.filter((task) => task.due_date === selectedDate)
   }, [tasks, selectedDate, today])
 
@@ -81,11 +105,11 @@ export function Home() {
     return { total, completed, remaining, percent, streak }
   }, [dateScopedTasks, habits])
 
-  // Apply the priority filter to the date-filtered task list.
+  // Apply the priority filter to the task list.
   const filteredTasks = useMemo(() => {
-    if (priorityFilter === 'all') return dateScopedTasks
-    return dateScopedTasks.filter((task) => task.priority === priorityFilter)
-  }, [dateScopedTasks, priorityFilter])
+    if (priorityFilter === 'all') return listTasks
+    return listTasks.filter((task) => task.priority === priorityFilter)
+  }, [listTasks, priorityFilter])
 
   const showHabits = contentFilter === 'all' || contentFilter === 'habits'
   const showTasks = contentFilter === 'all' || contentFilter === 'todo'
@@ -97,11 +121,27 @@ export function Home() {
     if (preferences.sound.completionSound) playCompletionSound()
   }
 
+  // Switching the selected day clears the completion feedback, so finished
+  // tasks disappear from the list again.
+  function handleSelectDate(key) {
+    setSelectedDate(key)
+    setSessionCompleted((prev) => ({ ...prev, ids: new Set() }))
+  }
+
   async function handleToggleTask(task) {
     try {
       setActionError(null)
+      const wasCompleted = Boolean(task.is_completed)
       await toggleTask(task)
-      if (!task.is_completed) maybePlaySound()
+      // Remember the completion so the card keeps its struck-through state
+      // until the user switches the day or reloads the app.
+      setSessionCompleted((prev) => {
+        const ids = new Set(prev.ids)
+        if (wasCompleted) ids.delete(task.id)
+        else ids.add(task.id)
+        return { ...prev, ids }
+      })
+      if (!wasCompleted) maybePlaySound()
     } catch (err) {
       setActionError(err.message)
     }
@@ -160,18 +200,15 @@ export function Home() {
             {getGreeting()}, {displayName} 👋
           </h2>
           <p className="mt-0.5 text-sm text-on-surface-variant">
-            Yuk selesaikan target harianmu hari ini.
+            Let's complete your daily goals today.
           </p>
         </div>
-        <Button icon={Plus} onClick={() => setTaskModal({ open: true, task: null })}>
-          Tambah Tugas
-        </Button>
       </section>
 
       {/* Topbar calendar + date filter */}
       <TopbarCalendar
         selectedDate={selectedDate}
-        onSelect={setSelectedDate}
+        onSelect={handleSelectDate}
         tasks={tasks}
         habits={habits}
       />
@@ -180,22 +217,22 @@ export function Home() {
       <section className="m3-card flex flex-col items-center gap-6 rounded-3xl bg-gradient-to-br from-primary-container/60 to-surface p-6 shadow-m3-2 sm:gap-10 sm:p-8 md:flex-row">
         <ProgressRing percent={stats.percent} />
         <div className="flex-1 text-center md:text-left">
-          <h3 className="text-lg font-semibold text-on-surface">Progres {periodLabel}</h3>
+          <h3 className="text-lg font-semibold text-on-surface">Progress {periodLabel}</h3>
           <p className="mt-1 text-sm text-on-surface-variant">
             {stats.total === 0
               ? isTodayView
-                ? 'Belum ada tugas untuk hari ini. Mulai dengan menambah tugas pertamamu.'
-                : `Belum ada tugas dengan tenggat ${periodLabel}.`
+                ? 'No tasks for today yet. Start by adding your first task.'
+                : `No tasks due on ${periodLabel}.`
               : isTodayView
-                ? `${stats.percent}% tugas hari ini telah selesai${
-                    overdueCount > 0 ? ' (termasuk tugas yang menunggak).' : '.'
+                ? `${stats.percent}% of today's tasks are done${
+                    overdueCount > 0 ? ' (including overdue tasks).' : '.'
                   }`
-                : `${stats.percent}% tugas pada ${periodLabel} telah selesai.`}
+                : `${stats.percent}% of the tasks on ${periodLabel} are done.`}
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 md:justify-start">
-            <StatChip icon={Flame} label={`${stats.streak} Hari Streak`} />
-            <StatChip icon={CheckCircle2} label={`${stats.completed} Selesai`} />
-            <StatChip icon={Pin} label={`${stats.remaining} Tersisa`} />
+            <StatChip icon={Flame} label={`${stats.streak} Day Streak`} />
+            <StatChip icon={CheckCircle2} label={`${stats.completed} Completed`} />
+            <StatChip icon={Pin} label={`${stats.remaining} Remaining`} />
           </div>
         </div>
       </section>
@@ -209,7 +246,7 @@ export function Home() {
       {/* Category filter chips */}
       <section className="flex flex-wrap items-center gap-3">
         <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
-          Tampilkan
+          Show
         </span>
         <FilterChips options={CONTENT_FILTERS} value={contentFilter} onChange={setContentFilter} />
       </section>
@@ -224,7 +261,7 @@ export function Home() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-xs font-bold uppercase tracking-wide text-on-surface-variant">
-                Pelacak Kebiasaan
+                Habit Tracker
               </h2>
               <Button
                 size="sm"
@@ -232,14 +269,14 @@ export function Home() {
                 icon={Target}
                 onClick={() => setHabitModal({ open: true, habit: null })}
               >
-                Kebiasaan
+                Habits
               </Button>
             </div>
             {/* Sub-row balances the priority filter on the right column */}
             <div className="flex min-h-[2.25rem] items-center">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-1.5 text-xs font-medium text-on-primary-container">
                 <Flame size={14} className="text-tertiary" />
-                {habits.length} kebiasaan • rekor {stats.streak} hari
+                {habits.length} habits • best streak {stats.streak} days
               </span>
             </div>
             <HabitList
@@ -258,7 +295,7 @@ export function Home() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-xs font-bold uppercase tracking-wide text-on-surface-variant">
-                Daftar Tugas
+                Task List
               </h2>
               <Button
                 size="sm"
@@ -266,7 +303,7 @@ export function Home() {
                 icon={Plus}
                 onClick={() => setTaskModal({ open: true, task: null })}
               >
-                Tugas
+                Tasks
               </Button>
             </div>
             {/* Priority filter and the selected date context */}
@@ -276,7 +313,7 @@ export function Home() {
                 {isTodayView && overdueCount > 0 ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-error-container px-2.5 py-1 text-[11px] font-medium text-on-error-container">
                     <AlertCircle size={12} />
-                    {overdueCount} menunggak
+                    {overdueCount} overdue
                   </span>
                 ) : null}
                 <span className="text-[11px] font-medium text-on-surface-variant">
@@ -291,13 +328,16 @@ export function Home() {
               onEdit={(task) => setTaskModal({ open: true, task })}
               onDelete={(task) => setConfirmDelete({ type: 'task', item: task })}
               onAdd={() => setTaskModal({ open: true, task: null })}
+              today={today}
+              sessionCompletedIds={sessionCompletedIds}
+              smartView={isTodayView}
               emptyTitle={
-                isTodayView ? 'Belum ada tugas hari ini' : 'Tidak ada tugas di tanggal ini'
+                isTodayView ? 'No tasks today' : 'No tasks on this date'
               }
               emptyDescription={
                 isTodayView
-                  ? 'Yuk buat tugas pertamamu agar harimu lebih teratur!'
-                  : 'Pilih tanggal lain atau tambahkan tugas baru untuk tanggal ini.'
+                  ? 'Create your first task to make your day more organized!'
+                  : 'Pick another date or add a new task for this date.'
               }
             />
           </div>
@@ -327,24 +367,24 @@ export function Home() {
       <Modal
         open={Boolean(confirmDelete)}
         onClose={() => setConfirmDelete(null)}
-        title={confirmDelete?.type === 'task' ? 'Hapus Tugas' : 'Hapus Kebiasaan'}
+        title={confirmDelete?.type === 'task' ? 'Delete Task' : 'Delete Habit'}
         footer={
           <>
             <Button variant="text" onClick={() => setConfirmDelete(null)}>
-              Batal
+              Cancel
             </Button>
             <Button variant="danger" onClick={handleConfirmDelete}>
-              Hapus
+              Delete
             </Button>
           </>
         }
       >
         <p className="text-sm text-on-surface-variant">
-          Yakin ingin menghapus{' '}
+          Are you sure you want to delete{' '}
           <span className="font-medium text-on-surface">
             {confirmDelete?.item?.title ?? confirmDelete?.item?.name}
           </span>
-          ? Tindakan ini tidak dapat dibatalkan.
+          ? This action cannot be undone.
         </p>
       </Modal>
     </div>

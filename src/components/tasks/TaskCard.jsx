@@ -6,9 +6,11 @@ import {
   PRIORITY_LABELS,
 } from '../../utils/constants'
 import { formatDueLabel, formatTime, isOverdue, isToday } from '../../utils/dateUtils'
+import { useTranslation } from '../../i18n'
 
 // Single task row with a completion checkbox, metadata and row actions.
 export function TaskCard({ task, onToggle, onEdit, onDelete }) {
+  const { t } = useTranslation()
   const overdue = !task.is_completed && isOverdue(task.due_date)
   const dueToday = !task.is_completed && isToday(task.due_date)
   const color = getColorTag(task.color)
@@ -16,23 +18,21 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
   return (
     <article
       className={`m3-card group relative flex gap-3 overflow-hidden rounded-3xl p-4 pl-5
-        transition-all duration-200 hover:-translate-y-0.5 hover:shadow-m3-2 ${
-          task.is_completed ? 'opacity-70' : ''
-        }`}
+        transition-all duration-300 hover:-translate-y-0.5 hover:shadow-m3-2 ${
+          task.is_completed ? 'opacity-60' : ''
+        } ${overdue ? '!border-error/40 !bg-error-container/25 ring-1 ring-inset ring-error/30' : ''}`}
     >
-      {/* Color tag accent bar */}
+      {/* Color tag accent bar. It stays visible on completed cards as well. */}
       <span
-        className={`absolute inset-y-0 left-0 w-1.5 ${
-          task.is_completed ? 'bg-outline-variant' : ''
-        }`}
-        style={task.is_completed ? undefined : { backgroundColor: color.hex }}
+        className="absolute inset-y-0 left-0 w-1.5"
+        style={{ backgroundColor: color.hex }}
         aria-hidden="true"
       />
 
       <button
         type="button"
         onClick={() => onToggle(task)}
-        aria-label={task.is_completed ? 'Tandai belum selesai' : 'Tandai selesai'}
+        aria-label={task.is_completed ? 'Mark as not completed' : 'Mark as completed'}
         className={`m3-ripple mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2
           transition-all duration-200 ease-out active:scale-90 ${
             task.is_completed
@@ -63,7 +63,7 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
             <button
               type="button"
               onClick={() => onEdit(task)}
-              aria-label="Edit tugas"
+              aria-label="Edit task"
               className="rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-primary/10 hover:text-primary"
             >
               <Pencil size={15} />
@@ -71,7 +71,7 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
             <button
               type="button"
               onClick={() => onDelete(task)}
-              aria-label="Hapus tugas"
+              aria-label="Delete task"
               className="rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-error/10 hover:text-error"
             >
               <Trash2 size={15} />
@@ -87,6 +87,12 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
           <Badge className={PRIORITY_BADGE_STYLES[task.priority] ?? ''}>
             {PRIORITY_LABELS[task.priority] ?? task.priority}
           </Badge>
+
+          {overdue ? (
+            <Badge className="bg-error/15 text-error ring-1 ring-inset ring-error/30">
+              {t('tasks.badge.overdue')}
+            </Badge>
+          ) : null}
 
           {task.due_date ? (
             <span

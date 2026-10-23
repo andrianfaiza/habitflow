@@ -4,7 +4,7 @@ import { getColorTag } from '../../utils/constants'
 
 // Single habit row with a daily check-in control and streak badge.
 export function HabitCard({ habit, checkedToday, onToggle, onEdit, onDelete }) {
-  // Supporting text e.g. "Target 8 Gelas".
+  // Supporting text e.g. "Target 8 Glasses".
   const targetText =
     habit.target && habit.target > 1
       ? `Target ${habit.target}${habit.unit ? ` ${habit.unit}` : ''}`
@@ -26,7 +26,7 @@ export function HabitCard({ habit, checkedToday, onToggle, onEdit, onDelete }) {
       <button
         type="button"
         onClick={() => onToggle(habit)}
-        aria-label={checkedToday ? 'Batalkan check-in hari ini' : 'Check-in hari ini'}
+        aria-label={checkedToday ? 'Cancel today check-in' : 'Check in for today'}
         className={`m3-ripple flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border-2
           transition-all duration-200 ease-out active:scale-90 ${
             checkedToday
@@ -52,7 +52,7 @@ export function HabitCard({ habit, checkedToday, onToggle, onEdit, onDelete }) {
         ) : null}
         {habit.bestStreak > 0 ? (
           <p className="mt-0.5 text-[11px] text-on-surface-variant">
-            Rekor terbaik: {habit.bestStreak} hari
+            Best record: {habit.bestStreak} days
           </p>
         ) : null}
       </div>
@@ -61,7 +61,7 @@ export function HabitCard({ habit, checkedToday, onToggle, onEdit, onDelete }) {
         <button
           type="button"
           onClick={() => onEdit(habit)}
-          aria-label="Edit kebiasaan"
+          aria-label="Edit habit"
           className="rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-primary/10 hover:text-primary"
         >
           <Pencil size={15} />
@@ -69,7 +69,7 @@ export function HabitCard({ habit, checkedToday, onToggle, onEdit, onDelete }) {
         <button
           type="button"
           onClick={() => onDelete(habit)}
-          aria-label="Hapus kebiasaan"
+          aria-label="Delete habit"
           className="rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-error/10 hover:text-error"
         >
           <Trash2 size={15} />

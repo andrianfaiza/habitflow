@@ -8,15 +8,15 @@ export const PRIORITIES = {
 
 // Priority options rendered in forms and filters.
 export const PRIORITY_OPTIONS = [
-  { value: PRIORITIES.HIGH, label: 'Tinggi' },
-  { value: PRIORITIES.MEDIUM, label: 'Sedang' },
-  { value: PRIORITIES.LOW, label: 'Rendah' },
+  { value: PRIORITIES.HIGH, label: 'High' },
+  { value: PRIORITIES.MEDIUM, label: 'Medium' },
+  { value: PRIORITIES.LOW, label: 'Low' },
 ]
 
 export const PRIORITY_LABELS = {
-  [PRIORITIES.HIGH]: 'Tinggi',
-  [PRIORITIES.MEDIUM]: 'Sedang',
-  [PRIORITIES.LOW]: 'Rendah',
+  [PRIORITIES.HIGH]: 'High',
+  [PRIORITIES.MEDIUM]: 'Medium',
+  [PRIORITIES.LOW]: 'Low',
 }
 
 // Soft pill badge styling per priority (light + dark variants).
@@ -35,7 +35,7 @@ export const PRIORITY_BAR_STYLES = {
 
 // Main content filter chips (matches the design specification).
 export const CONTENT_FILTERS = [
-  { value: 'all', label: 'Semua' },
+  { value: 'all', label: 'All' },
   { value: 'habits', label: 'Habits' },
   { value: 'todo', label: 'To-Do' },
 ]

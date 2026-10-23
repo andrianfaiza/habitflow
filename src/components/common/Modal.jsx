@@ -37,7 +37,7 @@ export function Modal({ open, onClose, title, children, footer }) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Tutup"
+            aria-label="Close"
             className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-variant"
           >
             <X size={20} />

@@ -26,7 +26,7 @@ export function Header() {
           <Link
             to="/"
             className="flex items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label="HabitFlow — Dasbor"
+            aria-label="HabitFlow — Dashboard"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-m3-md bg-primary text-on-primary shadow-m3-1">
               {/* Simple flame mark representing the habit streak */}
@@ -41,11 +41,8 @@ export function Header() {
           </Link>
 
           <div className="flex items-center gap-1 sm:gap-2">
-            <span className="hidden rounded-full bg-surface-variant px-3 py-1.5 text-xs font-medium text-on-surface-variant md:inline-flex">
-              {formatDisplayDate(new Date())}
-            </span>
             <IconButton
-              label={isDark ? 'Mode terang' : 'Mode gelap'}
+              label={isDark ? 'Light mode' : 'Dark mode'}
               onClick={toggleTheme}
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -53,13 +50,13 @@ export function Header() {
             <NotificationBell />
             <Link
               to="/profile"
-              aria-label="Buka profil"
-              title="Buka profil"
+              aria-label="Open profile"
+              title="Open profile"
               className="rounded-full transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <Avatar size="sm" value={profile?.avatar_url} name={displayName || 'P'} />
             </Link>
-            <IconButton label="Keluar" onClick={signOut}>
+            <IconButton label="Sign out" onClick={signOut}>
               <LogOut size={18} />
             </IconButton>
           </div>

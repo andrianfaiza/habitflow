@@ -46,7 +46,7 @@ export function TaskForm({ open, onClose, onSubmit, initialTask = null, defaultD
   async function handleSubmit(event) {
     event.preventDefault()
     if (!form.title.trim()) {
-      setError('Judul tugas wajib diisi.')
+      setError('Task title is required.')
       return
     }
     setSaving(true)
@@ -62,7 +62,7 @@ export function TaskForm({ open, onClose, onSubmit, initialTask = null, defaultD
       })
       onClose()
     } catch (err) {
-      setError(err.message ?? 'Gagal menyimpan tugas.')
+      setError(err.message ?? 'Failed to save the task.')
     } finally {
       setSaving(false)
     }
@@ -72,42 +72,42 @@ export function TaskForm({ open, onClose, onSubmit, initialTask = null, defaultD
     <Modal
       open={open}
       onClose={onClose}
-      title={initialTask ? 'Edit Tugas' : 'Tambah Tugas'}
+      title={initialTask ? 'Edit Task' : 'Add Task'}
       footer={
         <>
           <Button variant="text" onClick={onClose} disabled={saving}>
-            Batal
+            Cancel
           </Button>
           <Button type="submit" form="task-form" disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan'}
+            {saving ? 'Saving...' : 'Save'}
           </Button>
         </>
       }
     >
       <form id="task-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
-          label="Judul"
-          placeholder="Contoh: Kirim laporan mingguan"
+          label="Title"
+          placeholder="Example: Send the weekly report"
           value={form.title}
           onChange={(e) => update('title', e.target.value)}
           autoFocus
         />
         <div className="flex flex-col gap-1.5">
           <label htmlFor="task-description" className="text-sm font-medium text-on-surface-variant">
-            Deskripsi
+            Description
           </label>
           <textarea
             id="task-description"
             rows={3}
             className="m3-field resize-none"
-            placeholder="Detail singkat (opsional)"
+            placeholder="Short details (optional)"
             value={form.description}
             onChange={(e) => update('description', e.target.value)}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="task-priority" className="text-sm font-medium text-on-surface-variant">
-            Prioritas
+            Priority
           </label>
           <select
             id="task-priority"
@@ -123,19 +123,19 @@ export function TaskForm({ open, onClose, onSubmit, initialTask = null, defaultD
           </select>
         </div>
         <ColorPicker
-          label="Warna tugas"
+          label="Task color"
           value={form.color}
           onChange={(color) => update('color', color)}
         />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
-            label="Tanggal jatuh tempo"
+            label="Due date"
             type="date"
             value={form.due_date}
             onChange={(e) => update('due_date', e.target.value)}
           />
           <Input
-            label="Waktu tenggat"
+            label="Deadline time"
             type="time"
             value={form.due_time}
             onChange={(e) => update('due_time', e.target.value)}

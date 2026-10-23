@@ -19,7 +19,7 @@ export function Login({ onSwitch }) {
     try {
       await signIn(email.trim(), password)
     } catch (err) {
-      setError(err.message ?? 'Gagal masuk. Coba lagi.')
+      setError(err.message ?? 'Failed to sign in. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -27,16 +27,16 @@ export function Login({ onSwitch }) {
 
   return (
     <div className="m3-card p-6 shadow-m3-2 sm:p-8">
-      <h2 className="text-xl font-semibold text-on-surface">Masuk</h2>
+      <h2 className="text-xl font-semibold text-on-surface">Sign In</h2>
       <p className="mt-1 text-sm text-on-surface-variant">
-        Selamat datang kembali! Masuk untuk melanjutkan.
+        Welcome back! Sign in to continue.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <Input
           label="Email"
           type="email"
-          placeholder="nama@email.com"
+          placeholder="name@email.com"
           autoComplete="email"
           required
           value={email}
@@ -59,14 +59,14 @@ export function Login({ onSwitch }) {
         ) : null}
 
         <Button type="submit" size="lg" icon={LogIn} disabled={loading} className="w-full">
-          {loading ? 'Memproses...' : 'Masuk'}
+          {loading ? 'Processing...' : 'Sign In'}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-on-surface-variant">
-        Belum punya akun?{' '}
+        Don't have an account?{' '}
         <button type="button" onClick={onSwitch} className="font-medium text-primary hover:underline">
-          Daftar di sini
+          Register here
         </button>
       </p>
     </div>

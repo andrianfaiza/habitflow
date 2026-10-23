@@ -63,7 +63,7 @@ export function useNotifications() {
             id: `task-due:${task.id}:${today}`,
             type: 'task_due',
             tone: 'warning',
-            title: 'Tugas jatuh tempo hari ini',
+            title: 'Task due today',
             message: task.title,
           })
         } else if (task.due_date === tomorrow) {
@@ -71,7 +71,7 @@ export function useNotifications() {
             id: `task-due:${task.id}:${tomorrow}`,
             type: 'task_due',
             tone: 'warning',
-            title: 'Tugas jatuh tempo besok',
+            title: 'Task due tomorrow',
             message: task.title,
           })
         }
@@ -90,8 +90,8 @@ export function useNotifications() {
             id: `habit-pending:${habit.id}:${today}`,
             type: 'habit_pending',
             tone: 'info',
-            title: 'Habit belum dicentang',
-            message: `${habit.name} menunggu check-in hari ini.`,
+            title: 'Habit not checked in',
+            message: `${habit.name} is waiting for today's check-in.`,
           })
         }
 
@@ -101,8 +101,8 @@ export function useNotifications() {
             id: `streak:${habit.id}:${habit.currentStreak}`,
             type: 'streak',
             tone: 'success',
-            title: `${habit.currentStreak} hari berturut-turut! 🔥`,
-            message: `Pertahankan streak "${habit.name}".`,
+            title: `${habit.currentStreak} days in a row! 🔥`,
+            message: `Keep up the streak on "${habit.name}".`,
           })
         }
       })

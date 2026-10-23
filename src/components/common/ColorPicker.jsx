@@ -2,7 +2,7 @@ import { Check } from 'lucide-react'
 import { COLOR_TAGS } from '../../utils/constants'
 
 // Accessible swatch picker used by the task and habit forms.
-export function ColorPicker({ value, onChange, label = 'Warna label' }) {
+export function ColorPicker({ value, onChange, label = 'Color label' }) {
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-sm font-medium text-on-surface-variant">{label}</span>

@@ -40,7 +40,7 @@ export function HabitForm({ open, onClose, onSubmit, initialHabit = null }) {
   async function handleSubmit(event) {
     event.preventDefault()
     if (!form.name.trim()) {
-      setError('Nama kebiasaan wajib diisi.')
+      setError('Habit name is required.')
       return
     }
     const target = Number.parseInt(form.target, 10)
@@ -56,7 +56,7 @@ export function HabitForm({ open, onClose, onSubmit, initialHabit = null }) {
       })
       onClose()
     } catch (err) {
-      setError(err.message ?? 'Gagal menyimpan kebiasaan.')
+      setError(err.message ?? 'Failed to save the habit.')
     } finally {
       setSaving(false)
     }
@@ -66,56 +66,56 @@ export function HabitForm({ open, onClose, onSubmit, initialHabit = null }) {
     <Modal
       open={open}
       onClose={onClose}
-      title={initialHabit ? 'Edit Kebiasaan' : 'Tambah Kebiasaan'}
+      title={initialHabit ? 'Edit Habit' : 'Add Habit'}
       footer={
         <>
           <Button variant="text" onClick={onClose} disabled={saving}>
-            Batal
+            Cancel
           </Button>
           <Button type="submit" form="habit-form" disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan'}
+            {saving ? 'Saving...' : 'Save'}
           </Button>
         </>
       }
     >
       <form id="habit-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
-          label="Nama kebiasaan"
-          placeholder="Contoh: Minum Air"
+          label="Habit name"
+          placeholder="Example: Drink Water"
           value={form.name}
           onChange={(e) => update('name', e.target.value)}
           autoFocus
         />
         <div className="flex flex-col gap-1.5">
           <label htmlFor="habit-description" className="text-sm font-medium text-on-surface-variant">
-            Deskripsi
+            Description
           </label>
           <textarea
             id="habit-description"
             rows={2}
             className="m3-field resize-none"
-            placeholder="Catatan singkat (opsional)"
+            placeholder="Short note (optional)"
             value={form.description}
             onChange={(e) => update('description', e.target.value)}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Target harian"
+            label="Daily target"
             type="number"
             min="1"
             value={form.target}
             onChange={(e) => update('target', e.target.value)}
           />
           <Input
-            label="Satuan"
-            placeholder="Gelas, Kali, ..."
+            label="Unit"
+            placeholder="Glasses, Times, ..."
             value={form.unit}
             onChange={(e) => update('unit', e.target.value)}
           />
         </div>
         <ColorPicker
-          label="Warna kebiasaan"
+          label="Habit color"
           value={form.color}
           onChange={(color) => update('color', color)}
         />

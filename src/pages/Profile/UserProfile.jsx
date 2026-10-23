@@ -20,7 +20,7 @@ export function UserProfile() {
   if (loading) {
     return (
       <div className="flex justify-center py-16">
-        <Loader label="Memuat profil..." />
+        <Loader label="Loading profile..." />
       </div>
     )
   }
@@ -39,10 +39,10 @@ export function UserProfile() {
     return (
       <div className="m3-card mx-auto flex max-w-md flex-col items-center gap-4 rounded-3xl p-8 text-center">
         <p className="text-sm text-on-surface-variant">
-          Profil belum tersedia. Coba muat ulang data profil.
+          The profile is not available yet. Try reloading the profile data.
         </p>
         <Button variant="tonal" icon={RefreshCw} onClick={() => reload()}>
-          Muat Ulang Profil
+          Reload Profile
         </Button>
       </div>
     )
@@ -75,7 +75,7 @@ function ProfileContent({ profile }) {
   }
 
   const joinDate = user?.created_at ? formatShortDate(new Date(user.created_at)) : '-'
-  const displayName = profile.full_name || user?.email?.split('@')[0] || 'Pengguna'
+  const displayName = profile.full_name || user?.email?.split('@')[0] || 'User'
 
   async function handleSaveInfo(event) {
     event.preventDefault()
@@ -83,9 +83,9 @@ function ProfileContent({ profile }) {
     setInfoStatus(null)
     try {
       await saveProfile({ full_name: fullName.trim() || null, bio: bio.trim() || null })
-      setInfoStatus({ type: 'success', message: 'Profil berhasil diperbarui.' })
+      setInfoStatus({ type: 'success', message: 'Profile updated successfully.' })
     } catch (err) {
-      setInfoStatus({ type: 'error', message: err.message ?? 'Gagal memperbarui profil.' })
+      setInfoStatus({ type: 'error', message: err.message ?? 'Failed to update the profile.' })
     } finally {
       setSavingInfo(false)
     }
@@ -107,22 +107,22 @@ function ProfileContent({ profile }) {
     setPasswordStatus(null)
 
     if (newPassword.length < 6) {
-      setPasswordStatus({ type: 'error', message: 'Kata sandi minimal 6 karakter.' })
+      setPasswordStatus({ type: 'error', message: 'Password must be at least 6 characters.' })
       return
     }
     if (newPassword !== confirmPassword) {
-      setPasswordStatus({ type: 'error', message: 'Konfirmasi kata sandi tidak cocok.' })
+      setPasswordStatus({ type: 'error', message: 'Password confirmation does not match.' })
       return
     }
 
     setSavingPassword(true)
     try {
       await updatePassword(newPassword)
-      setPasswordStatus({ type: 'success', message: 'Kata sandi berhasil diubah.' })
+      setPasswordStatus({ type: 'success', message: 'Password changed successfully.' })
       setNewPassword('')
       setConfirmPassword('')
     } catch (err) {
-      setPasswordStatus({ type: 'error', message: err.message ?? 'Gagal mengubah kata sandi.' })
+      setPasswordStatus({ type: 'error', message: err.message ?? 'Failed to change the password.' })
     } finally {
       setSavingPassword(false)
     }
@@ -130,7 +130,7 @@ function ProfileContent({ profile }) {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <h2 className="text-xl font-semibold text-on-surface">Profil Pengguna</h2>
+      <h2 className="text-xl font-semibold text-on-surface">User Profile</h2>
 
       {/* Summary card */}
       <section className="m3-card flex flex-col items-center gap-5 rounded-3xl bg-gradient-to-br from-primary-container/60 to-surface p-6 shadow-m3-2 sm:flex-row sm:items-center">
@@ -141,7 +141,7 @@ function ProfileContent({ profile }) {
             <Mail size={14} />
             {user?.email}
           </p>
-          <p className="mt-1 text-xs text-on-surface-variant">Bergabung sejak {joinDate}</p>
+          <p className="mt-1 text-xs text-on-surface-variant">Joined on {joinDate}</p>
         </div>
       </section>
 
@@ -149,14 +149,14 @@ function ProfileContent({ profile }) {
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard icon={Target} label="Total Habits" value={stats.totalHabits} />
         <StatCard icon={CheckCircle2} label="Completed Tasks" value={stats.completedTasks} />
-        <StatCard icon={Flame} label="Highest Streak" value={`${stats.highestStreak} hari`} />
+        <StatCard icon={Flame} label="Highest Streak" value={`${stats.highestStreak} days`} />
       </section>
 
       {/* Habit contribution heatmap */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Kontribusi Habit</h3>
+        <h3 className="text-base font-semibold text-on-surface">Habit Contribution</h3>
         <p className="mt-1 text-sm text-on-surface-variant">
-          Intensitas check-in habit selama 12 bulan terakhir.
+          Habit check-in intensity over the last 12 months.
         </p>
         <div className="mt-5">
           <HabitHeatmap logs={habitLogs} />
@@ -165,9 +165,9 @@ function ProfileContent({ profile }) {
 
       {/* Avatar picker */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Ubah Avatar</h3>
+        <h3 className="text-base font-semibold text-on-surface">Change Avatar</h3>
         <p className="mt-1 text-sm text-on-surface-variant">
-          Pilih salah satu preset di bawah ini.
+          Pick one of the presets below.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           {AVATAR_PRESETS.map((emoji) => {
@@ -178,7 +178,7 @@ function ProfileContent({ profile }) {
                 type="button"
                 disabled={savingAvatar}
                 onClick={() => handleSelectAvatar(emoji)}
-                aria-label={`Pilih avatar ${emoji}`}
+                aria-label={`Select avatar ${emoji}`}
                 aria-pressed={active}
                 className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl transition-all duration-200 hover:scale-110 disabled:opacity-50 ${
                   active
@@ -196,25 +196,25 @@ function ProfileContent({ profile }) {
             onClick={() => handleSelectAvatar(null)}
             className={`flex h-12 items-center justify-center rounded-full border border-dashed border-outline px-4 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-variant disabled:opacity-50`}
           >
-            Tanpa avatar
+            No avatar
           </button>
         </div>
       </section>
 
       {/* Display info */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Informasi Akun</h3>
+        <h3 className="text-base font-semibold text-on-surface">Account Information</h3>
 
         <form onSubmit={handleSaveInfo} className="mt-4 flex flex-col gap-4">
           <Input
-            label="Nama lengkap"
+            label="Full name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="Nama kamu"
+            placeholder="Your name"
           />
           <div className="flex flex-col gap-1.5">
             <label htmlFor="profile-bio" className="text-sm font-medium text-on-surface-variant">
-              Bio singkat
+              Short bio
             </label>
             <textarea
               id="profile-bio"
@@ -222,10 +222,10 @@ function ProfileContent({ profile }) {
               value={bio}
               maxLength={160}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Ceritakan sedikit tentang dirimu..."
+              placeholder="Tell a little bit about yourself..."
               className="m3-field resize-none"
             />
-            <span className="text-xs text-on-surface-variant">{bio.length}/160 karakter</span>
+            <span className="text-xs text-on-surface-variant">{bio.length}/160 characters</span>
           </div>
           <Input label="Email" value={user?.email ?? ''} disabled readOnly />
 
@@ -233,7 +233,7 @@ function ProfileContent({ profile }) {
 
           <div className="flex justify-end">
             <Button type="submit" icon={Save} disabled={savingInfo}>
-              {savingInfo ? 'Menyimpan...' : 'Simpan Perubahan'}
+              {savingInfo ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </form>
@@ -243,32 +243,32 @@ function ProfileContent({ profile }) {
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
         <h3 className="flex items-center gap-2 text-base font-semibold text-on-surface">
           <KeyRound size={18} className="text-primary" />
-          Ubah Kata Sandi
+          Change Password
         </h3>
 
         <form onSubmit={handleChangePassword} className="mt-4 flex flex-col gap-4">
           <Input
-            label="Kata sandi baru"
+            label="New password"
             type="password"
             autoComplete="new-password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Minimal 6 karakter"
+            placeholder="At least 6 characters"
           />
           <Input
-            label="Konfirmasi kata sandi"
+            label="Confirm new password"
             type="password"
             autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Ulangi kata sandi baru"
+            placeholder="Repeat the new password"
           />
 
           {passwordStatus ? <StatusMessage status={passwordStatus} /> : null}
 
           <div className="flex justify-end">
             <Button type="submit" icon={KeyRound} disabled={savingPassword}>
-              {savingPassword ? 'Menyimpan...' : 'Ubah Kata Sandi'}
+              {savingPassword ? 'Saving...' : 'Change Password'}
             </Button>
           </div>
         </form>

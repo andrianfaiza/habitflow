@@ -42,7 +42,7 @@ function AppContent() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader label="Memuat HabitFlow..." />
+        <Loader label="Loading HabitFlow..." />
       </div>
     )
   }

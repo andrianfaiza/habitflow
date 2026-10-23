@@ -3,9 +3,9 @@ import { NavLink } from 'react-router-dom'
 
 // Primary navigation tabs mapped to URL routes.
 const NAV_ITEMS = [
-  { to: '/', label: 'Dasbor', icon: LayoutDashboard, end: true },
-  { to: '/profile', label: 'Profil', icon: User },
-  { to: '/settings', label: 'Pengaturan', icon: Settings },
+  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/profile', label: 'Profile', icon: User },
+  { to: '/settings', label: 'Settings', icon: Settings },
 ]
 
 export function Navbar() {

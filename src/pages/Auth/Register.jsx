@@ -20,11 +20,11 @@ export function Register({ onSwitch }) {
     setError(null)
 
     if (password.length < 6) {
-      setError('Password minimal 6 karakter.')
+      setError('Password must be at least 6 characters.')
       return
     }
     if (password !== confirm) {
-      setError('Konfirmasi password tidak cocok.')
+      setError('Password confirmation does not match.')
       return
     }
 
@@ -33,7 +33,7 @@ export function Register({ onSwitch }) {
       await signUp(email.trim(), password, fullName.trim())
       setSuccess(true)
     } catch (err) {
-      setError(err.message ?? 'Gagal mendaftar. Coba lagi.')
+      setError(err.message ?? 'Failed to register. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -42,13 +42,13 @@ export function Register({ onSwitch }) {
   if (success) {
     return (
       <div className="m3-card p-6 text-center shadow-m3-2 sm:p-8">
-        <h2 className="text-xl font-semibold text-on-surface">Pendaftaran berhasil 🎉</h2>
+        <h2 className="text-xl font-semibold text-on-surface">Registration successful 🎉</h2>
         <p className="mt-2 text-sm text-on-surface-variant">
-          Cek email <span className="font-medium text-on-surface">{email}</span> untuk konfirmasi
-          akun, lalu masuk kembali.
+          Check your email <span className="font-medium text-on-surface">{email}</span> to confirm
+          your account, then sign in again.
         </p>
         <Button className="mt-6 w-full" onClick={onSwitch}>
-          Kembali ke halaman masuk
+          Back to sign in
         </Button>
       </div>
     )
@@ -56,15 +56,15 @@ export function Register({ onSwitch }) {
 
   return (
     <div className="m3-card p-6 shadow-m3-2 sm:p-8">
-      <h2 className="text-xl font-semibold text-on-surface">Daftar</h2>
+      <h2 className="text-xl font-semibold text-on-surface">Register</h2>
       <p className="mt-1 text-sm text-on-surface-variant">
-        Buat akun untuk mulai melacak tugas dan kebiasaanmu.
+        Create an account to start tracking your tasks and habits.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <Input
-          label="Nama lengkap"
-          placeholder="Nama kamu"
+          label="Full name"
+          placeholder="Your name"
           autoComplete="name"
           required
           value={fullName}
@@ -73,7 +73,7 @@ export function Register({ onSwitch }) {
         <Input
           label="Email"
           type="email"
-          placeholder="nama@email.com"
+          placeholder="name@email.com"
           autoComplete="email"
           required
           value={email}
@@ -82,16 +82,16 @@ export function Register({ onSwitch }) {
         <Input
           label="Password"
           type="password"
-          placeholder="Minimal 6 karakter"
+          placeholder="At least 6 characters"
           autoComplete="new-password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         <Input
-          label="Konfirmasi password"
+          label="Confirm password"
           type="password"
-          placeholder="Ulangi password"
+          placeholder="Repeat the password"
           autoComplete="new-password"
           required
           value={confirm}
@@ -105,14 +105,14 @@ export function Register({ onSwitch }) {
         ) : null}
 
         <Button type="submit" size="lg" icon={UserPlus} disabled={loading} className="w-full">
-          {loading ? 'Memproses...' : 'Daftar'}
+          {loading ? 'Processing...' : 'Register'}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-on-surface-variant">
-        Sudah punya akun?{' '}
+        Already have an account?{' '}
         <button type="button" onClick={onSwitch} className="font-medium text-primary hover:underline">
-          Masuk di sini
+          Sign in here
         </button>
       </p>
     </div>
