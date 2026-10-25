@@ -373,7 +373,7 @@ export function Home() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" size={16} />
                   <input
                     type="text"
-                    placeholder='Search tasks...'
+                    placeholder={t('tasks.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="m3-input h-10 w-64 rounded-full pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary/50"
