@@ -26,11 +26,11 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+        <div className="flex min-h-screen items-center justify-center bg-surface px-4">
+          <div className="m3-card w-full max-w-md p-6 shadow-m3-2">
             <div className="mb-4 flex items-center justify-center">
               <svg
-                className="h-16 w-16 text-red-500"
+                className="h-16 w-16 text-error"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -43,18 +43,18 @@ class ErrorBoundary extends Component {
                 />
               </svg>
             </div>
-            <h1 className="mb-2 text-center text-2xl font-bold text-gray-900">
+            <h1 className="mb-2 text-center text-2xl font-semibold text-on-surface">
               Something went wrong
             </h1>
-            <p className="mb-6 text-center text-gray-600">
+            <p className="mb-6 text-center text-on-surface-variant">
               An unexpected error occurred. Please try refreshing the page.
             </p>
             {this.state.error && (
-              <details className="mb-4 rounded bg-gray-100 p-4">
-                <summary className="cursor-pointer font-semibold text-gray-700">
+              <details className="mb-4 rounded-2xl bg-surface-variant p-4">
+                <summary className="cursor-pointer font-semibold text-on-surface">
                   Error details
                 </summary>
-                <pre className="mt-2 overflow-auto text-sm text-red-600">
+                <pre className="mt-2 overflow-auto text-sm text-on-error-container">
                   {this.state.error.toString()}
                   {this.state.errorInfo && this.state.errorInfo.componentStack}
                 </pre>
@@ -62,7 +62,7 @@ class ErrorBoundary extends Component {
             )}
             <button
               onClick={this.handleReset}
-              className="w-full rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              className="m3-ripple w-full rounded-2xl bg-primary px-4 py-2 font-semibold text-on-primary transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             >
               Refresh Page
             </button>
