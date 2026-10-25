@@ -110,6 +110,7 @@ export default {
     deleteTitle: 'Hapus Tugas',
     deleteConfirm:
       'Apakah Anda yakin ingin menghapus {title}? Tindakan ini tidak dapat dibatalkan.',
+    searchPlaceholder: 'Cari tugas...',
     groups: {
       overdue: 'Terlambat',
       today: 'Hari Ini',
