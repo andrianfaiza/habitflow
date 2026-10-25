@@ -14,6 +14,7 @@ import { AuthScreen } from './pages/Auth/AuthScreen'
 import { Home } from './pages/Dashboard/Home'
 import { UserProfile } from './pages/Profile/UserProfile'
 import { Settings } from './pages/Profile/Settings'
+import ErrorBoundary from './components/common/ErrorBoundary'
 
 // Shell for authenticated pages: header + routed page content.
 function AppLayout() {
@@ -73,16 +74,18 @@ function AppContent() {
 
 export default function App() {
   return (
-    <LocaleProvider>
-      <ThemeProvider>
-        <AuthProvider>
-          <ProfileProvider>
-            <DataProvider>
-              <AppContent />
-            </DataProvider>
-          </ProfileProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </LocaleProvider>
+    <ErrorBoundary>
+      <LocaleProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <ProfileProvider>
+              <DataProvider>
+                <AppContent />
+              </DataProvider>
+            </ProfileProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </LocaleProvider>
+    </ErrorBoundary>
   )
 }
