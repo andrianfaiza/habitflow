@@ -108,6 +108,7 @@ export default {
     deleteTitle: 'Delete Task',
     deleteConfirm:
       'Are you sure you want to delete {title}? This action cannot be undone.',
+    searchPlaceholder: 'Search tasks...',
     groups: {
       overdue: 'Overdue',
       today: 'Today',
