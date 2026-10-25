@@ -24,6 +24,8 @@ create table if not exists public.tasks (
   due_date      date,
   due_time      time,
   is_completed  boolean not null default false,
+  recurrence    text check (recurrence in ('none', 'daily', 'weekly', 'monthly')),
+  recurrence_end_date date,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
@@ -36,6 +38,10 @@ alter table public.tasks add column if not exists color text not null default 'l
 alter table public.tasks drop constraint if exists tasks_color_check;
 alter table public.tasks add constraint tasks_color_check
   check (color in ('orange', 'lavender', 'blue', 'mint', 'amber', 'pink'));
+
+-- Adds recurrence support for tasks.
+alter table public.tasks add column if not exists recurrence text check (recurrence in ('none', 'daily', 'weekly', 'monthly'));
+alter table public.tasks add column if not exists recurrence_end_date date;
 
 -- ------------------------------------------------------------
 -- HABITS
