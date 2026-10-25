@@ -1,8 +1,11 @@
 import en from './locales/en'
+import id from './locales/id'
+import { useLocale } from '../hooks/useLocale'
 
 export const DEFAULT_LOCALE = 'en'
+export const SUPPORTED_LOCALES = ['en', 'id']
 
-const DICTIONARIES = { en }
+const DICTIONARIES = { en, id }
 
 // Walks a dotted key ("tasks.groups.overdue") through a dictionary.
 function resolve(dictionary, key) {
@@ -26,10 +29,9 @@ export function translate(key, { locale = DEFAULT_LOCALE, vars } = {}) {
   )
 }
 
-// Translation accessor used by components.
+// Translation accessor used by components. The active language comes from
+// LocaleProvider, so switching it re-renders every consumer at once.
 export function useTranslation() {
-  return {
-    locale: DEFAULT_LOCALE,
-    t: (key, vars) => translate(key, { locale: DEFAULT_LOCALE, vars }),
-  }
+  const { locale, setLocale, t } = useLocale()
+  return { locale, setLocale, t }
 }
