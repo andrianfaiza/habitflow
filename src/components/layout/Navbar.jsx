@@ -1,14 +1,18 @@
 import { LayoutDashboard, Settings, User } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
+import { useTranslation } from '../../i18n'
 
-// Primary navigation tabs mapped to URL routes.
+// Primary navigation tabs mapped to URL routes. Labels are translated with
+// the active language.
 const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/profile', label: 'Profile', icon: User },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/', labelKey: 'nav.dashboard', icon: LayoutDashboard, end: true },
+  { to: '/profile', labelKey: 'nav.profile', icon: User },
+  { to: '/settings', labelKey: 'nav.settings', icon: Settings },
 ]
 
 export function Navbar() {
+  const { t } = useTranslation()
+
   return (
     <nav className="flex items-center gap-1">
       {NAV_ITEMS.map((item) => {
@@ -27,7 +31,7 @@ export function Navbar() {
             }
           >
             <Icon size={18} />
-            <span className="hidden sm:inline">{item.label}</span>
+            <span className="hidden sm:inline">{t(item.labelKey)}</span>
           </NavLink>
         )
       })}

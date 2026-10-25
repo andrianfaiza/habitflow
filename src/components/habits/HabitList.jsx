@@ -1,23 +1,35 @@
 import { Plus, Target } from 'lucide-react'
 import { HabitCard } from './HabitCard'
+import { HabitCardSkeleton } from './HabitCardSkeleton'
 import { EmptyState } from '../common/EmptyState'
 import { Loader } from '../common/Loader'
 import { Button } from '../common/Button'
+import { useTranslation } from '../../i18n'
 import { todayKey } from '../../utils/dateUtils'
 
 // Renders the habit list, with loading and empty states.
 export function HabitList({ habits, logs, loading, onToggle, onEdit, onDelete, onAdd }) {
-  if (loading) return <Loader label="Loading habits..." />
+  const { t } = useTranslation()
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-3">
+        {[...Array(3)].map((_, i) => (
+          <HabitCardSkeleton key={i} />
+        ))}
+      </div>
+    )
+  }
 
   if (habits.length === 0) {
     return (
       <EmptyState
         icon={Target}
-        title="No habits yet"
-        description="Start building your first routine today!"
+        title={t('habits.emptyTitle')}
+        description={t('habits.emptyDescription')}
         action={
           <Button size="sm" icon={Plus} onClick={onAdd}>
-            Add Habit
+            {t('habits.addHabit')}
           </Button>
         }
       />

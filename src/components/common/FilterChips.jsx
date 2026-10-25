@@ -1,10 +1,15 @@
+import { useTranslation } from '../../i18n'
+
 // Horizontal row of Material 3 filter chips.
 export function FilterChips({ options, value, onChange, className = '' }) {
+  const { t } = useTranslation()
+
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       {options.map((option) => {
         const active = option.value === value
         const Icon = option.icon
+        const label = option.labelKey ? t(option.labelKey) : option.label
         return (
           <button
             key={option.value}
@@ -19,7 +24,7 @@ export function FilterChips({ options, value, onChange, className = '' }) {
               }`}
           >
             {Icon ? <Icon size={15} /> : null}
-            {option.label}
+            {label}
           </button>
         )
       })}

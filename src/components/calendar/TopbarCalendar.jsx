@@ -4,14 +4,15 @@ import {
   addDays,
   addMonths,
   buildDateRange,
+  formatDisplayDate,
   fromDateKey,
   getMonthName,
   getWeekdayShort,
   getYear,
-  getDate,
   getWeekday,
   todayKey,
 } from '../../utils/dateUtils'
+import { useTranslation } from '../../i18n'
 import {
   DEFAULT_HABIT_COLOR,
   DEFAULT_TASK_COLOR,
@@ -36,6 +37,7 @@ function buildInitialRange() {
 // Expandable topbar calendar with a continuously scrollable date strip.
 // The visible month/year header follows the card at the center of the viewport.
 export function TopbarCalendar({ selectedDate, onSelect, tasks = [], habits = [] }) {
+  const { t, locale } = useTranslation()
   const [dateKeys, setDateKeys] = useState(buildInitialRange)
   const [centerDate, setCenterDate] = useState(selectedDate || todayKey())
   const [expanded, setExpanded] = useState(false)
@@ -219,10 +221,13 @@ export function TopbarCalendar({ selectedDate, onSelect, tasks = [], habits = []
             {getYear(center)}
           </p>
           <h3 className="truncate text-xl font-semibold text-on-surface sm:text-2xl">
-            {getMonthName(center)}
-            {!expanded ? (<>
-            , {getDate(center)} {getWeekday(center)}
-            </>) : null}
+            {getMonthName(center, locale)}
+            {!expanded
+              ? t('calendar.headerDetail', {
+                  day: center.getDate(),
+                  weekday: getWeekday(center, locale),
+                })
+              : null}
           </h3>
         </div>
 
@@ -235,18 +240,18 @@ export function TopbarCalendar({ selectedDate, onSelect, tasks = [], habits = []
             className="inline-flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-2 text-xs font-semibold text-on-primary-container transition-colors hover:bg-primary-container/80"
             >
             <CalendarDays size={14} />
-            <span className="hidden sm:inline">Today</span>
+            <span className="hidden sm:inline">{t('calendar.today')}</span>
           </button>
-          <IconButton label="Previous week" onClick={() => nudge(-7)}>
+          <IconButton label={t('calendar.previousWeek')} onClick={() => nudge(-7)}>
             <ChevronLeft size={16} />
           </IconButton>
-          <IconButton label="Next week" onClick={() => nudge(7)}>
+          <IconButton label={t('calendar.nextWeek')} onClick={() => nudge(7)}>
             <ChevronRight size={16} />
           </IconButton>
             </>
           ) : null}
           <IconButton
-            label={expanded ? 'Hide calendar' : 'Show calendar'}
+            label={expanded ? t('calendar.hide') : t('calendar.show')}
             onClick={() => setExpanded((prev) => !prev)}
           >
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -281,13 +286,15 @@ const DateStrip = memo(function DateStrip({
   scrollRef,
   onScroll,
 }) {
+  const { t, locale } = useTranslation()
+
   return (
     <div
       ref={scrollRef}
       onScroll={onScroll}
       className="m3-scrollbar flex gap-2 overflow-x-auto pb-5 pt-1"
       role="listbox"
-      aria-label="Select a date"
+      aria-label={t('calendar.selectDate')}
     >
       {dateKeys.map((key) => {
         const date = fromDateKey(key)
@@ -302,7 +309,9 @@ const DateStrip = memo(function DateStrip({
             type="button"
             role="option"
             aria-selected={isSelected}
-            aria-label={`Select ${date.getDate()} ${getMonthName(date)} ${getYear(date)}`}
+            aria-label={t('calendar.selectDateLabel', {
+              date: formatDisplayDate(date, { locale }),
+            })}
             onClick={() => onSelect(key)}
             style={{ width: CARD_WIDTH }}
             className={`flex h-[68px] shrink-0 flex-col items-center justify-center gap-1 rounded-2xl border transition-all duration-200 ${
@@ -314,7 +323,7 @@ const DateStrip = memo(function DateStrip({
             }`}
           >
             <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">
-              {getWeekdayShort(date)}
+              {getWeekdayShort(date, locale)}
             </span>
             <span className="text-base font-semibold leading-none">{date.getDate()}</span>
             <span

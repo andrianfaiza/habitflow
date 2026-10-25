@@ -1,23 +1,98 @@
 // Date helpers.
 // Habit log dates are always handled as local "YYYY-MM-DD" strings so the
 // value never shifts between the user's device and the Supabase server.
+//
+// Every formatting helper accepts an optional locale ("en" or "id") so the
+// calendar, task labels and profile dates follow the language picked in
+// Settings. English stays the default.
 
-const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
+const LOCALE_DATA = {
+  en: {
+    months: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ],
+    monthsShort: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ],
+    weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    greetings: {
+      morning: 'Good morning',
+      afternoon: 'Good afternoon',
+      evening: 'Good evening',
+      night: 'Good night',
+    },
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+  },
+  id: {
+    months: [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ],
+    monthsShort: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des',
+    ],
+    weekdays: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+    weekdaysShort: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+    greetings: {
+      morning: 'Selamat pagi',
+      afternoon: 'Selamat siang',
+      evening: 'Selamat sore',
+      night: 'Selamat malam',
+    },
+    today: 'Hari ini',
+    tomorrow: 'Besok',
+  },
+}
 
-const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+// Falls back to English for unknown locales so formatting never breaks.
+function getLocaleData(locale = 'en') {
+  return LOCALE_DATA[locale] ?? LOCALE_DATA.en
+}
 
 // Converts a Date (or date-like value) into a local "YYYY-MM-DD" key.
 export function toDateKey(date = new Date()) {
@@ -78,14 +153,18 @@ export function diffInDays(aKey, bKey) {
   return Math.round((a - b) / MS_PER_DAY)
 }
 
-// Human friendly English date, e.g. "18 October 2026".
-export function formatDisplayDate(date = new Date(), { withWeekday = false } = {}) {
+// Human friendly date, e.g. "18 October 2026" / "18 Oktober 2026".
+export function formatDisplayDate(
+  date = new Date(),
+  { withWeekday = false, locale = 'en' } = {},
+) {
   const d = date instanceof Date ? date : new Date(date)
+  const data = getLocaleData(locale)
   const day = d.getDate()
-  const month = MONTH_NAMES[d.getMonth()]
+  const month = data.months[d.getMonth()]
   const year = d.getFullYear()
   const base = `${day} ${month} ${year}`
-  return withWeekday ? `${WEEKDAY_NAMES[d.getDay()]}, ${base}` : base
+  return withWeekday ? `${data.weekdays[d.getDay()]}, ${base}` : base
 }
 
 // Formats a "HH:MM:SS" time string into "HH:MM".
@@ -96,28 +175,24 @@ export function formatTime(time) {
 }
 
 // Greeting based on the current hour of the day.
-export function getGreeting(date = new Date()) {
+export function getGreeting(date = new Date(), locale = 'en') {
   const hour = (date instanceof Date ? date : new Date(date)).getHours()
-  if (hour < 11) return 'Good morning'
-  if (hour < 15) return 'Good afternoon'
-  if (hour < 19) return 'Good evening'
-  return 'Good night'
+  const { greetings } = getLocaleData(locale)
+  if (hour < 11) return greetings.morning
+  if (hour < 15) return greetings.afternoon
+  if (hour < 19) return greetings.evening
+  return greetings.night
 }
 
-// English day for a Date or a "YYYY-MM-DD" key.
-export function getDay(date = new Date()) {
-  const d = date instanceof Date ? date : fromDateKey(date)
-  return [d.getDate()]
-}
-// English date for a Date or a "YYYY-MM-DD" key.
+// Day of the month for a Date or a "YYYY-MM-DD" key.
 export function getDate(date = new Date()) {
   const d = date instanceof Date ? date : fromDateKey(date)
-  return [d.getDate()]
+  return d.getDate()
 }
-// English month name for a Date or a "YYYY-MM-DD" key.
-export function getMonthName(date = new Date()) {
+// Localized month name for a Date or a "YYYY-MM-DD" key.
+export function getMonthName(date = new Date(), locale = 'en') {
   const d = date instanceof Date ? date : fromDateKey(date)
-  return MONTH_NAMES[d.getMonth()]
+  return getLocaleData(locale).months[d.getMonth()]
 }
 
 // Calendar year for a Date or a "YYYY-MM-DD" key.
@@ -126,15 +201,29 @@ export function getYear(date = new Date()) {
   return d.getFullYear()
 }
 
-// Short English weekday, e.g. "Monday".
-export function getWeekday(date = new Date()) {
+// Localized weekday name, e.g. "Monday" / "Senin".
+export function getWeekday(date = new Date(), locale = 'en') {
   const d = date instanceof Date ? date : fromDateKey(date)
-  return WEEKDAY_NAMES[d.getDay()]
+  return getLocaleData(locale).weekdays[d.getDay()]
 }
-// Short English weekday, e.g. "Mon".
-export function getWeekdayShort(date = new Date()) {
+// Localized short weekday, e.g. "Mon" / "Sen".
+export function getWeekdayShort(date = new Date(), locale = 'en') {
   const d = date instanceof Date ? date : fromDateKey(date)
-  return WEEKDAY_NAMES[d.getDay()].slice(0, 3)
+  return getLocaleData(locale).weekdaysShort[d.getDay()]
+}
+
+// Full month names for chart labels (e.g. the heatmap).
+export function getMonthNames(locale = 'en', { short = false } = {}) {
+  const data = getLocaleData(locale)
+  return [...(short ? data.monthsShort : data.months)]
+}
+
+// Weekday names for chart labels. `start` is the index of the first day
+// (0 = Sunday, 1 = Monday).
+export function getWeekdayNames(locale = 'en', { short = false, start = 0 } = {}) {
+  const data = getLocaleData(locale)
+  const names = short ? data.weekdaysShort : data.weekdays
+  return [...names.slice(start), ...names.slice(0, start)]
 }
 
 // Checks whether a due date is in the past (and not today).
@@ -155,19 +244,21 @@ export function isTomorrow(dateKey) {
   return dateKey === addDays(todayKey(), 1)
 }
 
-// Short English date, e.g. "18 Oct 2026".
-export function formatShortDate(date) {
+// Short localized date, e.g. "18 Oct 2026" / "18 Okt 2026".
+export function formatShortDate(date, locale = 'en') {
   const d = date instanceof Date ? date : new Date(date)
+  const data = getLocaleData(locale)
   const day = d.getDate()
-  const month = MONTH_NAMES[d.getMonth()].slice(0, 3)
+  const month = data.monthsShort[d.getMonth()]
   const year = d.getFullYear()
   return `${day} ${month} ${year}`
 }
 
 // Friendly label for a due date: "Today", "Tomorrow" or the short date.
-export function formatDueLabel(dateKey) {
+export function formatDueLabel(dateKey, locale = 'en') {
   if (!dateKey) return null
-  if (isToday(dateKey)) return 'Today'
-  if (isTomorrow(dateKey)) return 'Tomorrow'
-  return formatShortDate(fromDateKey(dateKey))
+  const data = getLocaleData(locale)
+  if (isToday(dateKey)) return data.today
+  if (isTomorrow(dateKey)) return data.tomorrow
+  return formatShortDate(fromDateKey(dateKey), locale)
 }

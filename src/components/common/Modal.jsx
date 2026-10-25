@@ -1,9 +1,12 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import { useTranslation } from '../../i18n'
 
 // Accessible dialog rendered in a portal. Closes on backdrop click or Escape.
 export function Modal({ open, onClose, title, children, footer }) {
+  const { t } = useTranslation()
+
   useEffect(() => {
     if (!open) return undefined
 
@@ -37,7 +40,7 @@ export function Modal({ open, onClose, title, children, footer }) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('common.close')}
             className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-variant"
           >
             <X size={20} />

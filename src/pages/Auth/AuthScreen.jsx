@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Login } from './Login'
 import { Register } from './Register'
+import { useTranslation } from '../../i18n'
 
 // Full-screen authentication page that toggles between login and register.
 export function AuthScreen() {
   const [mode, setMode] = useState('login')
+  const { t } = useTranslation()
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-container via-surface to-secondary-container p-4">
@@ -14,7 +16,7 @@ export function AuthScreen() {
             🔥
           </span>
           <h1 className="text-2xl font-bold text-on-surface">HabitFlow</h1>
-          <p className="text-sm text-on-surface-variant">To Do List &amp; Habit Tracker</p>
+          <p className="text-sm text-on-surface-variant">{t('app.tagline')}</p>
         </div>
 
         {mode === 'login' ? (

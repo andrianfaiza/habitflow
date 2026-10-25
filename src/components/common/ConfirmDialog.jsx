@@ -1,5 +1,6 @@
 import { Modal } from './Modal'
 import { Button } from './Button'
+import { useTranslation } from '../../i18n'
 
 // Reusable confirmation dialog for destructive actions.
 export function ConfirmDialog({
@@ -8,11 +9,13 @@ export function ConfirmDialog({
   onConfirm,
   title,
   message,
-  confirmLabel = 'Delete',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   variant = 'danger',
   loading = false,
 }) {
+  const { t } = useTranslation()
+
   return (
     <Modal
       open={open}
@@ -21,10 +24,10 @@ export function ConfirmDialog({
       footer={
         <>
           <Button variant="text" onClick={onClose} disabled={loading}>
-            {cancelLabel}
+            {cancelLabel ?? t('common.cancel')}
           </Button>
           <Button variant={variant} onClick={onConfirm} disabled={loading}>
-            {loading ? 'Processing...' : confirmLabel}
+            {loading ? t('common.processing') : confirmLabel ?? t('common.delete')}
           </Button>
         </>
       }

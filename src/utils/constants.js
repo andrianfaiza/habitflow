@@ -6,17 +6,18 @@ export const PRIORITIES = {
   LOW: 'low',
 }
 
-// Priority options rendered in forms and filters.
+// Priority options rendered in forms and filters. The label is resolved with
+// the active language through t(labelKey).
 export const PRIORITY_OPTIONS = [
-  { value: PRIORITIES.HIGH, label: 'High' },
-  { value: PRIORITIES.MEDIUM, label: 'Medium' },
-  { value: PRIORITIES.LOW, label: 'Low' },
+  { value: PRIORITIES.HIGH, labelKey: 'priority.high' },
+  { value: PRIORITIES.MEDIUM, labelKey: 'priority.medium' },
+  { value: PRIORITIES.LOW, labelKey: 'priority.low' },
 ]
 
-export const PRIORITY_LABELS = {
-  [PRIORITIES.HIGH]: 'High',
-  [PRIORITIES.MEDIUM]: 'Medium',
-  [PRIORITIES.LOW]: 'Low',
+export const PRIORITY_LABEL_KEYS = {
+  [PRIORITIES.HIGH]: 'priority.high',
+  [PRIORITIES.MEDIUM]: 'priority.medium',
+  [PRIORITIES.LOW]: 'priority.low',
 }
 
 // Soft pill badge styling per priority (light + dark variants).
@@ -35,9 +36,9 @@ export const PRIORITY_BAR_STYLES = {
 
 // Main content filter chips (matches the design specification).
 export const CONTENT_FILTERS = [
-  { value: 'all', label: 'All' },
-  { value: 'habits', label: 'Habits' },
-  { value: 'todo', label: 'To-Do' },
+  { value: 'all', labelKey: 'filters.all' },
+  { value: 'habits', labelKey: 'filters.habits' },
+  { value: 'todo', labelKey: 'filters.todo' },
 ]
 
 // Preset avatars (emoji) that users can pick from on the profile page.
@@ -46,12 +47,12 @@ export const AVATAR_PRESETS = ['🦊', '🐼', '🐨', '🦁', '🐧', '🐸', '
 // Custom color tags for tasks and habits. Only the id is persisted in the
 // database; the hex value is used for inline accents and calendar dots.
 export const COLOR_TAGS = [
-  { id: 'orange', label: 'Orange', hex: '#F97316' },
-  { id: 'lavender', label: 'Lavender', hex: '#6750A4' },
-  { id: 'blue', label: 'Blue', hex: '#3B82F6' },
-  { id: 'mint', label: 'Mint', hex: '#10B981' },
-  { id: 'amber', label: 'Amber', hex: '#F59E0B' },
-  { id: 'pink', label: 'Pink', hex: '#EC4899' },
+  { id: 'orange', labelKey: 'colors.orange', hex: '#F97316' },
+  { id: 'lavender', labelKey: 'colors.lavender', hex: '#6750A4' },
+  { id: 'blue', labelKey: 'colors.blue', hex: '#3B82F6' },
+  { id: 'mint', labelKey: 'colors.mint', hex: '#10B981' },
+  { id: 'amber', labelKey: 'colors.amber', hex: '#F59E0B' },
+  { id: 'pink', labelKey: 'colors.pink', hex: '#EC4899' },
 ]
 
 export const DEFAULT_TASK_COLOR = 'lavender'

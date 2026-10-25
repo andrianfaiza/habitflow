@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useProfile } from '../../hooks/useProfile'
 import { useTheme } from '../../hooks/useTheme'
-import { formatDisplayDate } from '../../utils/dateUtils'
+import { useTranslation } from '../../i18n'
 import { Avatar } from '../common/Avatar'
 import { NotificationBell } from './NotificationBell'
 import { Navbar } from './Navbar'
@@ -15,6 +15,7 @@ export function Header() {
   const { isDark, toggleTheme } = useTheme()
   const { signOut } = useAuth()
   const { profile } = useProfile()
+  const { t } = useTranslation()
 
   const displayName = profile?.full_name || ''
 
@@ -26,7 +27,7 @@ export function Header() {
           <Link
             to="/"
             className="flex items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label="HabitFlow — Dashboard"
+            aria-label={t('header.home')}
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-m3-md bg-primary text-on-primary shadow-m3-1">
               {/* Simple flame mark representing the habit streak */}
@@ -35,14 +36,14 @@ export function Header() {
             <div className="leading-tight">
               <h1 className="text-sm font-semibold text-on-surface sm:text-base">HabitFlow</h1>
               <p className="hidden text-xs text-on-surface-variant sm:block">
-                To Do List &amp; Habit Tracker
+                {t('app.tagline')}
               </p>
             </div>
           </Link>
 
           <div className="flex items-center gap-1 sm:gap-2">
             <IconButton
-              label={isDark ? 'Light mode' : 'Dark mode'}
+              label={isDark ? t('header.lightMode') : t('header.darkMode')}
               onClick={toggleTheme}
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -50,13 +51,13 @@ export function Header() {
             <NotificationBell />
             <Link
               to="/profile"
-              aria-label="Open profile"
-              title="Open profile"
+              aria-label={t('header.openProfile')}
+              title={t('header.openProfile')}
               className="rounded-full transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <Avatar size="sm" value={profile?.avatar_url} name={displayName || 'P'} />
             </Link>
-            <IconButton label="Sign out" onClick={signOut}>
+            <IconButton label={t('header.signOut')} onClick={signOut}>
               <LogOut size={18} />
             </IconButton>
           </div>

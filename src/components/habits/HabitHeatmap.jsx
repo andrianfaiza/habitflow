@@ -3,12 +3,15 @@ import { ActivityCalendar } from 'react-activity-calendar'
 import 'react-activity-calendar/tooltips.css'
 import { CalendarCheck, CalendarDays, Flame, Trophy } from 'lucide-react'
 import { useTheme } from '../../hooks/useTheme'
+import { useTranslation } from '../../i18n'
 import { calculateStreaks } from '../../utils/streakUtils'
 import {
   addDays,
   buildDateRange,
   formatDisplayDate,
   fromDateKey,
+  getMonthNames,
+  getWeekdayNames,
   todayKey,
 } from '../../utils/dateUtils'
 
@@ -17,8 +20,6 @@ const HEATMAP_THEME = {
   light: ['#e6efe7', '#c8e6c9', '#9bd3a1', '#4caf50', '#2e7d32'],
   dark: ['#1b241d', '#244a2e', '#2f7a43', '#43a95a', '#7bd88f'],
 }
-
-const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // Maps a daily check-in count to one of the five intensity levels.
 function toLevel(count, maxCount) {
@@ -30,6 +31,7 @@ function toLevel(count, maxCount) {
 // Habit contribution heatmap plus aggregate statistics for the last year.
 export function HabitHeatmap({ logs = [] }) {
   const { isDark } = useTheme()
+  const { t, locale } = useTranslation()
 
   const stats = useMemo(() => {
     const end = todayKey()
@@ -65,10 +67,26 @@ export function HabitHeatmap({ logs = [] }) {
   return (
     <div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <HeatStat icon={CalendarCheck} label="Total Check-ins" value={stats.totalCheckIns} />
-        <HeatStat icon={CalendarDays} label="Active Days" value={stats.activeDays} />
-        <HeatStat icon={Flame} label="Current Streak" value={`${stats.currentStreak} days`} />
-        <HeatStat icon={Trophy} label="Best Streak" value={`${stats.bestStreak} days`} />
+        <HeatStat
+          icon={CalendarCheck}
+          label={t('heatmap.totalCheckIns')}
+          value={stats.totalCheckIns}
+        />
+        <HeatStat
+          icon={CalendarDays}
+          label={t('heatmap.activeDays')}
+          value={stats.activeDays}
+        />
+        <HeatStat
+          icon={Flame}
+          label={t('heatmap.currentStreak')}
+          value={t('common.days', { count: stats.currentStreak })}
+        />
+        <HeatStat
+          icon={Trophy}
+          label={t('heatmap.bestStreak')}
+          value={t('common.days', { count: stats.bestStreak })}
+        />
       </div>
 
       <div className="m3-scrollbar mt-5 overflow-x-auto pb-1">
@@ -86,23 +104,25 @@ export function HabitHeatmap({ logs = [] }) {
           showColorLegend
           showTotalCount={false}
           labels={{
-            months: MONTH_LABELS,
-            weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            legend: { less: 'Less', more: 'More' },
+            months: getMonthNames(locale, { short: true }),
+            weekdays: getWeekdayNames(locale, { short: true, start: 1 }),
+            legend: { less: t('heatmap.less'), more: t('heatmap.more') },
           }}
           tooltips={{
             activity: {
               text: (activity) =>
-                `${activity.count} check-ins • ${formatDisplayDate(fromDateKey(activity.date))}`,
+                t('heatmap.activity', {
+                  count: activity.count,
+                  date: formatDisplayDate(fromDateKey(activity.date), { locale }),
+                }),
             },
-            colorLegend: { text: (level) => `Intensity ${level}` },
+            colorLegend: { text: (level) => t('heatmap.intensity', { level }) },
           }}
         />
       </div>
 
       <p className="mt-3 text-xs text-on-surface-variant">
-        Each square represents one day. The color gets darker the more habits you
-        checked in on that day.
+        {t('heatmap.description')}
       </p>
     </div>
   )

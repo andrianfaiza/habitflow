@@ -1,5 +1,6 @@
 import { ClipboardList, Plus } from 'lucide-react'
 import { TaskCard } from './TaskCard'
+import { TaskCardSkeleton } from './TaskCardSkeleton'
 import { TaskGroupSection } from './TaskGroupSection'
 import { EmptyState } from '../common/EmptyState'
 import { Loader } from '../common/Loader'
@@ -26,7 +27,15 @@ export function TaskList({
 }) {
   const { t } = useTranslation()
 
-  if (loading) return <Loader label="Loading tasks..." />
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-3">
+        {[...Array(3)].map((_, i) => (
+          <TaskCardSkeleton key={i} />
+        ))}
+      </div>
+    )
+  }
 
   const groups = smartView
     ? groupTasksByDueDate(tasks, today, sessionCompletedIds)
@@ -49,7 +58,7 @@ export function TaskList({
         }
         action={
           <Button size="sm" icon={Plus} onClick={onAdd}>
-            Add Task
+            {t('tasks.addTask')}
           </Button>
         }
       />

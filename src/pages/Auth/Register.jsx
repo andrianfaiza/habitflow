@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { UserPlus } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { useTranslation } from '../../i18n'
 import { Input } from '../../components/common/Input'
 import { Button } from '../../components/common/Button'
 
 // Registration form: name + email + password + confirmation.
 export function Register({ onSwitch }) {
   const { signUp } = useAuth()
+  const { t } = useTranslation()
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,11 +22,11 @@ export function Register({ onSwitch }) {
     setError(null)
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+      setError(t('auth.errors.passwordLength'))
       return
     }
     if (password !== confirm) {
-      setError('Password confirmation does not match.')
+      setError(t('auth.errors.passwordMismatch'))
       return
     }
 
@@ -33,7 +35,7 @@ export function Register({ onSwitch }) {
       await signUp(email.trim(), password, fullName.trim())
       setSuccess(true)
     } catch (err) {
-      setError(err.message ?? 'Failed to register. Please try again.')
+      setError(err.message ?? t('auth.register.error'))
     } finally {
       setLoading(false)
     }
@@ -42,13 +44,16 @@ export function Register({ onSwitch }) {
   if (success) {
     return (
       <div className="m3-card p-6 text-center shadow-m3-2 sm:p-8">
-        <h2 className="text-xl font-semibold text-on-surface">Registration successful 🎉</h2>
+        <h2 className="text-xl font-semibold text-on-surface">
+          {t('auth.register.successTitle')}
+        </h2>
         <p className="mt-2 text-sm text-on-surface-variant">
-          Check your email <span className="font-medium text-on-surface">{email}</span> to confirm
-          your account, then sign in again.
+          {t('auth.register.checkEmail')}{' '}
+          <span className="font-medium text-on-surface">{email}</span>{' '}
+          {t('auth.register.confirmEmail')}
         </p>
         <Button className="mt-6 w-full" onClick={onSwitch}>
-          Back to sign in
+          {t('auth.register.backToSignIn')}
         </Button>
       </div>
     )
@@ -56,22 +61,22 @@ export function Register({ onSwitch }) {
 
   return (
     <div className="m3-card p-6 shadow-m3-2 sm:p-8">
-      <h2 className="text-xl font-semibold text-on-surface">Register</h2>
+      <h2 className="text-xl font-semibold text-on-surface">{t('auth.register.title')}</h2>
       <p className="mt-1 text-sm text-on-surface-variant">
-        Create an account to start tracking your tasks and habits.
+        {t('auth.register.subtitle')}
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <Input
-          label="Full name"
-          placeholder="Your name"
+          label={t('common.fullName')}
+          placeholder={t('auth.register.fullNamePlaceholder')}
           autoComplete="name"
           required
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
         />
         <Input
-          label="Email"
+          label={t('common.email')}
           type="email"
           placeholder="name@email.com"
           autoComplete="email"
@@ -80,18 +85,18 @@ export function Register({ onSwitch }) {
           onChange={(e) => setEmail(e.target.value)}
         />
         <Input
-          label="Password"
+          label={t('common.password')}
           type="password"
-          placeholder="At least 6 characters"
+          placeholder={t('auth.register.passwordPlaceholder')}
           autoComplete="new-password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         <Input
-          label="Confirm password"
+          label={t('auth.register.confirmPassword')}
           type="password"
-          placeholder="Repeat the password"
+          placeholder={t('auth.register.confirmPasswordPlaceholder')}
           autoComplete="new-password"
           required
           value={confirm}
@@ -105,14 +110,14 @@ export function Register({ onSwitch }) {
         ) : null}
 
         <Button type="submit" size="lg" icon={UserPlus} disabled={loading} className="w-full">
-          {loading ? 'Processing...' : 'Register'}
+          {loading ? t('common.processing') : t('auth.register.submit')}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-on-surface-variant">
-        Already have an account?{' '}
+        {t('auth.register.alreadyHaveAccount')}{' '}
         <button type="button" onClick={onSwitch} className="font-medium text-primary hover:underline">
-          Sign in here
+          {t('auth.register.signInLink')}
         </button>
       </p>
     </div>

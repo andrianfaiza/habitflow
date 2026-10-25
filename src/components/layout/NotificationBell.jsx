@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bell, BellRing, CalendarClock, CheckCheck, Flame, Target, Trash2, X } from 'lucide-react'
 import { useNotifications } from '../../hooks/useNotifications'
+import { useTranslation } from '../../i18n'
 import { NOTIFICATION_TONES } from '../../utils/constants'
 
 const TYPE_ICONS = {
@@ -13,6 +14,7 @@ const TYPE_ICONS = {
 export function NotificationBell() {
   const { notifications, unreadCount, markRead, markAllRead, dismiss, clearAll } =
     useNotifications()
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const containerRef = useRef(null)
 
@@ -42,7 +44,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        aria-label="Notifications"
+        aria-label={t('notifications.aria')}
         aria-haspopup="true"
         aria-expanded={open}
         className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-variant"
@@ -60,10 +62,12 @@ export function NotificationBell() {
           {/* Header */}
           <div className="flex items-center justify-between gap-2 border-b border-outline-variant px-4 py-3">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-on-surface">Notifications</h3>
+              <h3 className="text-sm font-semibold text-on-surface">
+                {t('notifications.title')}
+              </h3>
               {unreadCount > 0 ? (
                 <span className="rounded-full bg-primary-container px-2 py-0.5 text-[10px] font-semibold text-on-primary-container">
-                  {unreadCount} new
+                  {t('notifications.new', { count: unreadCount })}
                 </span>
               ) : null}
             </div>
@@ -74,7 +78,7 @@ export function NotificationBell() {
                 className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
               >
                 <CheckCheck size={14} />
-                Mark all as read
+                {t('notifications.markAllRead')}
               </button>
             ) : null}
           </div>
@@ -86,9 +90,11 @@ export function NotificationBell() {
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-variant text-on-surface-variant">
                   <Bell size={22} />
                 </span>
-                <p className="text-sm font-medium text-on-surface">No notifications</p>
+                <p className="text-sm font-medium text-on-surface">
+                  {t('notifications.emptyTitle')}
+                </p>
                 <p className="text-xs text-on-surface-variant">
-                  All your tasks and habits are all clear. 🎉
+                  {t('notifications.emptyDescription')}
                 </p>
               </div>
             ) : (
@@ -119,7 +125,7 @@ export function NotificationBell() {
                     <button
                       type="button"
                       onClick={() => dismiss(item.id)}
-                      aria-label="Dismiss notification"
+                      aria-label={t('notifications.dismiss')}
                       className="rounded-full p-1 text-on-surface-variant opacity-0 transition-opacity hover:bg-error/10 hover:text-error group-hover:opacity-100"
                     >
                       <X size={14} />
@@ -139,7 +145,7 @@ export function NotificationBell() {
                 className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium text-on-surface-variant transition-colors hover:bg-error/10 hover:text-error"
               >
                 <Trash2 size={14} />
-                Delete all notifications
+                {t('notifications.clearAll')}
               </button>
             </div>
           ) : null}

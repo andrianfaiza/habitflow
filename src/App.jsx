@@ -4,7 +4,9 @@ import { AuthProvider } from './context/AuthProvider'
 import { ProfileProvider } from './context/ProfileProvider'
 import { DataProvider } from './context/DataProvider'
 import { ThemeProvider } from './context/ThemeProvider'
+import { LocaleProvider } from './context/LocaleProvider'
 import { useAuth } from './hooks/useAuth'
+import { useTranslation } from './i18n'
 import { Loader } from './components/common/Loader'
 import { Header } from './components/layout/Header'
 import { Container } from './components/layout/Container'
@@ -32,6 +34,7 @@ function AppLayout() {
 function AppContent() {
   const { user, loading } = useAuth()
   const location = useLocation()
+  const { t } = useTranslation()
 
   // Reset the document scroll whenever the route changes. Without this a page
   // opened from a scrolled dashboard inherits the old offset and can look blank.
@@ -42,7 +45,7 @@ function AppContent() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader label="Loading HabitFlow..." />
+        <Loader label={t('app.loading')} />
       </div>
     )
   }
@@ -70,14 +73,16 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <ProfileProvider>
-          <DataProvider>
-            <AppContent />
-          </DataProvider>
-        </ProfileProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <LocaleProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ProfileProvider>
+            <DataProvider>
+              <AppContent />
+            </DataProvider>
+          </ProfileProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </LocaleProvider>
   )
 }

@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { LogIn } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { useTranslation } from '../../i18n'
 import { Input } from '../../components/common/Input'
 import { Button } from '../../components/common/Button'
 
 // Email + password login form.
 export function Login({ onSwitch }) {
   const { signIn } = useAuth()
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
@@ -19,7 +21,7 @@ export function Login({ onSwitch }) {
     try {
       await signIn(email.trim(), password)
     } catch (err) {
-      setError(err.message ?? 'Failed to sign in. Please try again.')
+      setError(err.message ?? t('auth.login.error'))
     } finally {
       setLoading(false)
     }
@@ -27,14 +29,14 @@ export function Login({ onSwitch }) {
 
   return (
     <div className="m3-card p-6 shadow-m3-2 sm:p-8">
-      <h2 className="text-xl font-semibold text-on-surface">Sign In</h2>
+      <h2 className="text-xl font-semibold text-on-surface">{t('auth.login.title')}</h2>
       <p className="mt-1 text-sm text-on-surface-variant">
-        Welcome back! Sign in to continue.
+        {t('auth.login.subtitle')}
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <Input
-          label="Email"
+          label={t('common.email')}
           type="email"
           placeholder="name@email.com"
           autoComplete="email"
@@ -43,7 +45,7 @@ export function Login({ onSwitch }) {
           onChange={(e) => setEmail(e.target.value)}
         />
         <Input
-          label="Password"
+          label={t('common.password')}
           type="password"
           placeholder="••••••••"
           autoComplete="current-password"
@@ -59,14 +61,14 @@ export function Login({ onSwitch }) {
         ) : null}
 
         <Button type="submit" size="lg" icon={LogIn} disabled={loading} className="w-full">
-          {loading ? 'Processing...' : 'Sign In'}
+          {loading ? t('common.processing') : t('auth.login.submit')}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-on-surface-variant">
-        Don't have an account?{' '}
+        {t('auth.login.noAccount')}{' '}
         <button type="button" onClick={onSwitch} className="font-medium text-primary hover:underline">
-          Register here
+          {t('auth.login.registerLink')}
         </button>
       </p>
     </div>

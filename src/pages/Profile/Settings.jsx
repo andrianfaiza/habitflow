@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   Bell,
   Download,
+  Languages,
   LogOut,
   Moon,
   RotateCcw,
@@ -13,6 +14,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useData } from '../../hooks/useData'
 import { useProfile } from '../../hooks/useProfile'
 import { useTheme } from '../../hooks/useTheme'
+import { useTranslation } from '../../i18n'
 import { Button } from '../../components/common/Button'
 import { Toggle } from '../../components/common/Toggle'
 import { ConfirmDialog } from '../../components/common/ConfirmDialog'
@@ -20,13 +22,20 @@ import { resolvePreferences } from '../../utils/constants'
 import { todayKey } from '../../utils/dateUtils'
 import { deleteAccount, exportUserData, resetUserData } from '../../services/profileService'
 
-// Settings page: appearance, notification & sound preferences, data management
-// and account actions.
+// Language choices offered in Settings. English is the default.
+const LANGUAGE_OPTIONS = [
+  { value: 'en', labelKey: 'settings.language.english', descriptionKey: 'settings.language.englishDescription' },
+  { value: 'id', labelKey: 'settings.language.indonesian', descriptionKey: 'settings.language.indonesianDescription' },
+]
+
+// Settings page: appearance, language, notification & sound preferences, data
+// management and account actions.
 export function Settings() {
   const { isDark, theme, setTheme } = useTheme()
   const { user, signOut } = useAuth()
   const { profile, savePreferences } = useProfile()
   const { reloadTasks, reloadHabits } = useData()
+  const { t, locale, setLocale } = useTranslation()
 
   const preferences = resolvePreferences(profile?.preferences)
 
@@ -43,7 +52,7 @@ export function Settings() {
     try {
       await savePreferences(next)
     } catch (err) {
-      setStatus({ type: 'error', message: err.message ?? 'Failed to save preferences.' })
+      setStatus({ type: 'error', message: err.message ?? t('settings.preferencesError') })
     }
   }
 
@@ -61,9 +70,9 @@ export function Settings() {
       anchor.click()
       anchor.remove()
       URL.revokeObjectURL(url)
-      setStatus({ type: 'success', message: 'Data exported successfully.' })
+      setStatus({ type: 'success', message: t('settings.exportSuccess') })
     } catch (err) {
-      setStatus({ type: 'error', message: err.message ?? 'Failed to export the data.' })
+      setStatus({ type: 'error', message: err.message ?? t('settings.exportError') })
     }
   }
 
@@ -75,7 +84,7 @@ export function Settings() {
       if (dialog === 'reset') {
         await resetUserData(user.id)
         await Promise.all([reloadTasks(), reloadHabits()])
-        setStatus({ type: 'success', message: 'All tasks and habits have been deleted.' })
+        setStatus({ type: 'success', message: t('settings.resetSuccess') })
       } else if (dialog === 'delete') {
         await deleteAccount()
         await signOut()
@@ -83,7 +92,7 @@ export function Settings() {
       }
       setDialog(null)
     } catch (err) {
-      setStatus({ type: 'error', message: err.message ?? 'Something went wrong.' })
+      setStatus({ type: 'error', message: err.message ?? t('settings.genericError') })
     } finally {
       setProcessing(false)
     }
@@ -91,7 +100,7 @@ export function Settings() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <h2 className="text-xl font-semibold text-on-surface">Settings</h2>
+      <h2 className="text-xl font-semibold text-on-surface">{t('settings.title')}</h2>
 
       {status ? (
         <p
@@ -107,9 +116,11 @@ export function Settings() {
 
       {/* Appearance */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Appearance</h3>
+        <h3 className="text-base font-semibold text-on-surface">
+          {t('settings.appearance.title')}
+        </h3>
         <p className="mt-1 text-sm text-on-surface-variant">
-          Choose the theme that is most comfortable for your eyes.
+          {t('settings.appearance.description')}
         </p>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <button
@@ -122,7 +133,9 @@ export function Settings() {
             }`}
           >
             <Sun size={22} className="text-primary" />
-            <span className="text-sm font-medium text-on-surface">Light Mode</span>
+            <span className="text-sm font-medium text-on-surface">
+              {t('settings.appearance.light')}
+            </span>
           </button>
           <button
             type="button"
@@ -134,36 +147,78 @@ export function Settings() {
             }`}
           >
             <Moon size={22} className="text-primary" />
-            <span className="text-sm font-medium text-on-surface">Dark Mode</span>
+            <span className="text-sm font-medium text-on-surface">
+              {t('settings.appearance.dark')}
+            </span>
           </button>
         </div>
         <p className="mt-3 text-xs text-on-surface-variant">
-          Current theme: {isDark ? 'Dark' : 'Light'}
+          {t('settings.appearance.current', {
+            theme: isDark
+              ? t('settings.appearance.darkShort')
+              : t('settings.appearance.lightShort'),
+          })}
         </p>
+      </section>
+
+      {/* Language */}
+      <section className="m3-card rounded-3xl p-6 shadow-m3-1">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-on-surface">
+          <Languages size={18} className="text-primary" />
+          {t('settings.language.title')}
+        </h3>
+        <p className="mt-1 text-sm text-on-surface-variant">
+          {t('settings.language.description')}
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          {LANGUAGE_OPTIONS.map((option) => {
+            const active = locale === option.value
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setLocale(option.value)}
+                aria-pressed={active}
+                className={`flex flex-col items-center gap-1 rounded-3xl border p-4 text-center transition-all duration-200 ${
+                  active
+                    ? 'border-primary bg-primary/10 shadow-m3-1'
+                    : 'border-outline-variant hover:bg-surface-variant'
+                }`}
+              >
+                <span className="text-sm font-medium text-on-surface">
+                  {t(option.labelKey)}
+                </span>
+                <span className="text-[11px] text-on-surface-variant">
+                  {active ? t('settings.language.active') : t(option.descriptionKey)}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </section>
 
       {/* Notification preferences */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
         <h3 className="flex items-center gap-2 text-base font-semibold text-on-surface">
           <Bell size={18} className="text-primary" />
-          Notification Preferences
+          {t('settings.notifications.title')}
         </h3>
         <div className="mt-4 flex flex-col gap-4">
           <Toggle
-            label="Habit Reminders"
-            description="Show notifications for habits that have not been checked in today."
+            label={t('settings.notifications.habitReminders')}
+            description={t('settings.notifications.habitRemindersDescription')}
             checked={preferences.notifications.habitReminders}
             onChange={(value) => updatePreference('notifications', 'habitReminders', value)}
           />
           <Toggle
-            label="Task Deadlines"
-            description="Remind you about tasks that are due today or tomorrow."
+            label={t('settings.notifications.taskDeadlines')}
+            description={t('settings.notifications.taskDeadlinesDescription')}
             checked={preferences.notifications.taskDeadlines}
             onChange={(value) => updatePreference('notifications', 'taskDeadlines', value)}
           />
           <Toggle
-            label="Email Notifications"
-            description="Receive a reminder summary by email."
+            label={t('settings.notifications.email')}
+            description={t('settings.notifications.emailDescription')}
             checked={preferences.notifications.email}
             onChange={(value) => updatePreference('notifications', 'email', value)}
           />
@@ -174,12 +229,12 @@ export function Settings() {
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
         <h3 className="flex items-center gap-2 text-base font-semibold text-on-surface">
           <Volume2 size={18} className="text-primary" />
-          Sound &amp; Effects
+          {t('settings.sound.title')}
         </h3>
         <div className="mt-4 flex flex-col gap-4">
           <Toggle
-            label="Completion Sound Effect"
-            description="Play a short tone when you mark a task or habit as done."
+            label={t('settings.sound.completion')}
+            description={t('settings.sound.completionDescription')}
             checked={preferences.sound.completionSound}
             onChange={(value) => updatePreference('sound', 'completionSound', value)}
           />
@@ -188,45 +243,53 @@ export function Settings() {
 
       {/* Data management */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Data Management</h3>
+        <h3 className="text-base font-semibold text-on-surface">
+          {t('settings.data.title')}
+        </h3>
         <p className="mt-1 text-sm text-on-surface-variant">
-          Export a backup of your data or clear the data from this account.
+          {t('settings.data.description')}
         </p>
 
         <div className="mt-4 flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-outline-variant p-4">
             <div>
-              <p className="text-sm font-medium text-on-surface">Export Data</p>
+              <p className="text-sm font-medium text-on-surface">
+                {t('settings.data.exportTitle')}
+              </p>
               <p className="text-xs text-on-surface-variant">
-                Download all tasks, habits, and logs as JSON.
+                {t('settings.data.exportDescription')}
               </p>
             </div>
             <Button variant="outlined" icon={Download} onClick={handleExport}>
-              Export
+              {t('settings.data.exportButton')}
             </Button>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-outline-variant p-4">
             <div>
-              <p className="text-sm font-medium text-on-surface">Reset Data</p>
+              <p className="text-sm font-medium text-on-surface">
+                {t('settings.data.resetTitle')}
+              </p>
               <p className="text-xs text-on-surface-variant">
-                Delete all tasks and habits. Your account stays active.
+                {t('settings.data.resetDescription')}
               </p>
             </div>
             <Button variant="danger-text" icon={RotateCcw} onClick={() => setDialog('reset')}>
-              Reset
+              {t('settings.data.resetButton')}
             </Button>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-error/40 bg-error/5 p-4">
             <div>
-              <p className="text-sm font-medium text-error">Delete Account</p>
+              <p className="text-sm font-medium text-error">
+                {t('settings.data.deleteTitle')}
+              </p>
               <p className="text-xs text-on-surface-variant">
-                Permanently delete your account and all of its data.
+                {t('settings.data.deleteDescription')}
               </p>
             </div>
             <Button variant="danger" icon={Trash2} onClick={() => setDialog('delete')}>
-              Delete Account
+              {t('settings.data.deleteButton')}
             </Button>
           </div>
         </div>
@@ -234,19 +297,22 @@ export function Settings() {
 
       {/* Account */}
       <section className="m3-card rounded-3xl p-6 shadow-m3-1">
-        <h3 className="text-base font-semibold text-on-surface">Account</h3>
+        <h3 className="text-base font-semibold text-on-surface">
+          {t('settings.account.title')}
+        </h3>
         <p className="mt-1 text-sm text-on-surface-variant">
-          Signed in as <span className="font-medium text-on-surface">{user?.email}</span>
+          {t('settings.account.signedInAs')}{' '}
+          <span className="font-medium text-on-surface">{user?.email}</span>
         </p>
         <div className="mt-4">
           <Button variant="outlined" icon={LogOut} onClick={signOut}>
-            Sign out
+            {t('settings.account.signOut')}
           </Button>
         </div>
       </section>
 
       <p className="text-center text-xs text-on-surface-variant">
-        HabitFlow v1.0 — To Do List &amp; Habit Tracker
+        {t('settings.version')}
       </p>
 
       <ConfirmDialog
@@ -254,9 +320,9 @@ export function Settings() {
         onClose={() => setDialog(null)}
         onConfirm={handleConfirm}
         loading={processing}
-        title="Reset Data"
-        message="All your tasks and habits will be permanently deleted. Your account and profile will be kept. Continue?"
-        confirmLabel="Yes, Reset Data"
+        title={t('settings.resetDialog.title')}
+        message={t('settings.resetDialog.message')}
+        confirmLabel={t('settings.resetDialog.confirm')}
       />
 
       <ConfirmDialog
@@ -264,9 +330,9 @@ export function Settings() {
         onClose={() => setDialog(null)}
         onConfirm={handleConfirm}
         loading={processing}
-        title="Delete Account"
-        message="Your account along with all tasks, habits, and logs will be permanently deleted and cannot be recovered. Are you sure you want to continue?"
-        confirmLabel="Yes, Delete Account"
+        title={t('settings.deleteDialog.title')}
+        message={t('settings.deleteDialog.message')}
+        confirmLabel={t('settings.deleteDialog.confirm')}
       />
     </div>
   )

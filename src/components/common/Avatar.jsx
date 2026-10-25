@@ -1,3 +1,5 @@
+import { useTranslation } from '../../i18n'
+
 // Renders a user avatar from either an image URL, a preset emoji, or the
 // first letter of the user's name.
 const SIZES = {
@@ -7,6 +9,7 @@ const SIZES = {
 }
 
 export function Avatar({ value, name, size = 'md', className = '' }) {
+  const { t } = useTranslation()
   const sizeClasses = SIZES[size] ?? SIZES.md
   const isUrl = typeof value === 'string' && /^https?:\/\//.test(value)
   const initial = (name || '?').trim().charAt(0).toUpperCase()
@@ -15,7 +18,7 @@ export function Avatar({ value, name, size = 'md', className = '' }) {
     return (
       <img
         src={value}
-        alt={name ?? 'Avatar'}
+        alt={name ?? t('common.avatar')}
         className={`shrink-0 rounded-full object-cover ${sizeClasses} ${className}`}
       />
     )

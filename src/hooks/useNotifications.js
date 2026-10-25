@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useData } from './useData'
 import { useProfile } from './useProfile'
+import { useTranslation } from '../i18n'
 import { resolvePreferences } from '../utils/constants'
 import { addDays, todayKey } from '../utils/dateUtils'
 
@@ -32,6 +33,7 @@ function writeStored(key, value) {
 export function useNotifications() {
   const { tasks, habits, habitLogs } = useData()
   const { profile } = useProfile()
+  const { t } = useTranslation()
   const preferences = useMemo(
     () => resolvePreferences(profile?.preferences),
     [profile?.preferences],
@@ -63,7 +65,7 @@ export function useNotifications() {
             id: `task-due:${task.id}:${today}`,
             type: 'task_due',
             tone: 'warning',
-            title: 'Task due today',
+            title: t('notifications.taskDueToday'),
             message: task.title,
           })
         } else if (task.due_date === tomorrow) {
@@ -71,7 +73,7 @@ export function useNotifications() {
             id: `task-due:${task.id}:${tomorrow}`,
             type: 'task_due',
             tone: 'warning',
-            title: 'Task due tomorrow',
+            title: t('notifications.taskDueTomorrow'),
             message: task.title,
           })
         }
@@ -90,8 +92,8 @@ export function useNotifications() {
             id: `habit-pending:${habit.id}:${today}`,
             type: 'habit_pending',
             tone: 'info',
-            title: 'Habit not checked in',
-            message: `${habit.name} is waiting for today's check-in.`,
+            title: t('notifications.habitPending'),
+            message: t('notifications.habitPendingMessage', { name: habit.name }),
           })
         }
 
@@ -101,15 +103,15 @@ export function useNotifications() {
             id: `streak:${habit.id}:${habit.currentStreak}`,
             type: 'streak',
             tone: 'success',
-            title: `${habit.currentStreak} days in a row! 🔥`,
-            message: `Keep up the streak on "${habit.name}".`,
+            title: t('notifications.streakTitle', { count: habit.currentStreak }),
+            message: t('notifications.streakMessage', { name: habit.name }),
           })
         }
       })
     }
 
     return items.filter((item) => !dismissedIds.includes(item.id))
-  }, [tasks, habits, habitLogs, preferences, dismissedIds])
+  }, [tasks, habits, habitLogs, preferences, dismissedIds, t])
 
   const unreadCount = useMemo(
     () => notifications.filter((item) => !readIds.includes(item.id)).length,

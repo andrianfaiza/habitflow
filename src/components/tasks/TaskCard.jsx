@@ -3,14 +3,14 @@ import { Badge } from '../common/Badge'
 import {
   getColorTag,
   PRIORITY_BADGE_STYLES,
-  PRIORITY_LABELS,
+  PRIORITY_LABEL_KEYS,
 } from '../../utils/constants'
 import { formatDueLabel, formatTime, isOverdue, isToday } from '../../utils/dateUtils'
 import { useTranslation } from '../../i18n'
 
 // Single task row with a completion checkbox, metadata and row actions.
 export function TaskCard({ task, onToggle, onEdit, onDelete }) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const overdue = !task.is_completed && isOverdue(task.due_date)
   const dueToday = !task.is_completed && isToday(task.due_date)
   const color = getColorTag(task.color)
@@ -32,7 +32,9 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
       <button
         type="button"
         onClick={() => onToggle(task)}
-        aria-label={task.is_completed ? 'Mark as not completed' : 'Mark as completed'}
+        aria-label={
+          task.is_completed ? t('tasks.aria.markNotCompleted') : t('tasks.aria.markCompleted')
+        }
         className={`m3-ripple mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2
           transition-all duration-200 ease-out active:scale-90 ${
             task.is_completed
@@ -63,7 +65,7 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
             <button
               type="button"
               onClick={() => onEdit(task)}
-              aria-label="Edit task"
+              aria-label={t('tasks.aria.edit')}
               className="rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-primary/10 hover:text-primary"
             >
               <Pencil size={15} />
@@ -71,7 +73,7 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
             <button
               type="button"
               onClick={() => onDelete(task)}
-              aria-label="Delete task"
+              aria-label={t('tasks.aria.delete')}
               className="rounded-full p-1.5 text-on-surface-variant transition-colors hover:bg-error/10 hover:text-error"
             >
               <Trash2 size={15} />
@@ -85,7 +87,9 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
 
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <Badge className={PRIORITY_BADGE_STYLES[task.priority] ?? ''}>
-            {PRIORITY_LABELS[task.priority] ?? task.priority}
+            {PRIORITY_LABEL_KEYS[task.priority]
+              ? t(PRIORITY_LABEL_KEYS[task.priority])
+              : task.priority}
           </Badge>
 
           {overdue ? (
@@ -105,7 +109,7 @@ export function TaskCard({ task, onToggle, onEdit, onDelete }) {
               }`}
             >
               <Calendar size={13} />
-              {formatDueLabel(task.due_date)}
+              {formatDueLabel(task.due_date, locale)}
             </span>
           ) : null}
 
