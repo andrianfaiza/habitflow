@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from './context/AuthProvider'
 import { ProfileProvider } from './context/ProfileProvider'
 import { DataProvider } from './context/DataProvider'
@@ -81,6 +82,7 @@ export default function App() {
             <ProfileProvider>
               <DataProvider>
                 <AppContent />
+                <Analytics />
               </DataProvider>
             </ProfileProvider>
           </AuthProvider>
