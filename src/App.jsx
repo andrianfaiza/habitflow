@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider } from './context/AuthProvider'
 import { ProfileProvider } from './context/ProfileProvider'
@@ -82,6 +83,7 @@ export default function App() {
             <ProfileProvider>
               <DataProvider>
                 <AppContent />
+                <SpeedInsights />
                 <Analytics />
               </DataProvider>
             </ProfileProvider>
